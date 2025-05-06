@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import Image from "next/image";
 
 function getCategories() {
   const postsDir = path.join(process.cwd(), "posts");
@@ -47,10 +48,12 @@ export default function Sidebar() {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <img
+        <Image
           src="/images/profile.jpg"
           alt="Profile"
-          className="w-32 h-32 rounded-full mx-auto"
+          width={128}
+          height={128}
+          className="rounded-full mx-auto"
         />
         <h2 className="mt-4 text-xl font-bold">PyungSeok Kim</h2>
         <p className="text-red-500">Backend, Bigdata Engineer</p>

@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Use Tailwind's prose class for markdown */
+.markdown {
+  @apply prose lg:prose-lg prose-slate max-w-none;
+}

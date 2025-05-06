@@ -1,22 +1,30 @@
-import { getPostHtml, getPostSlugs } from '@/lib/posts';
-import { notFound } from 'next/navigation';
+// src/app/posts/[slug]/page.tsx
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import "@/styles/markdown.css";
 
 export async function generateStaticParams() {
-  const slugs = getPostSlugs();
-  return slugs.map((slug) => ({ slug }));
+  const postsDir = path.join(process.cwd(), "posts");
+  const filenames = fs.readdirSync(postsDir);
+
+  return filenames.map((filename) => ({
+    slug: filename.replace(/\.md$/, ""),
+  }));
 }
 
-export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = await getPostHtml(slug);
-
-  if (!post) return notFound();
+  const filePath = path.join(process.cwd(), "posts", `${slug}.md`);
+  const fileContent = fs.readFileSync(filePath, "utf8");
+  const { content, data } = matter(fileContent);
 
   return (
-    <main className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-2">{post.title}</h1>
-      <p className="text-sm text-gray-500 mb-4">{post.date}</p>
-      <div className="prose" dangerouslySetInnerHTML={{ __html: post.contentHtml }} />
-    </main>
+    <article className="prose lg:prose-lg mx-auto p-6">
+      <h1>{data.title}</h1>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+    </article>
   );
 }
