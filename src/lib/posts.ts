@@ -1,34 +1,27 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { remark } from 'remark';
-import html from 'remark-html';
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
 
-const postsDirectory = path.join(process.cwd(), 'posts');
-
-export function getPostSlugs() {
-  return fs.readdirSync(postsDirectory).map((file) => file.replace(/\.md$/, ''));
+export interface PostMeta {
+  title: string;
+  date: string;
+  category: string;
+  slug: string;
 }
 
-export function getPostBySlug(slug: string) {
-  const fullPath = path.join(postsDirectory, `${slug}.md`);
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
-  return {
-    slug,
-    title: data.title,
-    date: data.date,
-    content,
-  };
-}
+export function getAllPosts(): PostMeta[] {
+  const postsDir = path.join(process.cwd(), "posts");
+  const filenames = fs.readdirSync(postsDir);
 
-export async function getPostHtml(slug: string) {
-  const { title, date, content } = getPostBySlug(slug);
-  const processed = await remark().use(html).process(content);
-  return {
-    slug,
-    title,
-    date,
-    contentHtml: processed.toString(),
-  };
+  return filenames.map((filename) => {
+    const filePath = path.join(postsDir, filename);
+    const fileContent = fs.readFileSync(filePath, "utf8");
+    const { data } = matter(fileContent);
+    return {
+      title: data.title,
+      date: data.date,
+      category: data.category,
+      slug: filename.replace(/\.md$/, ""),
+    };
+  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }

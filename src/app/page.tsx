@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import PostList from "@/components/PostList";
+import { getAllPosts } from "../lib/posts";
 
 export default function HomePage() {
   return (
@@ -11,7 +12,7 @@ export default function HomePage() {
           <Sidebar />
         </aside>
         <section className="flex-1">
-          <PostList />
+          <PostList posts={getAllPosts()}/>
         </section>
       </main>
     </div>

@@ -12,6 +12,7 @@
     "@tailwindcss/cli": "^4.1.5",
     "gray-matter": "^4.0.3",
     "list": "^2.0.19",
+    "markdown-to-jsx": "^7.7.6",
     "next": "15.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
