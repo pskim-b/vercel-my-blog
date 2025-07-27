@@ -8,15 +8,20 @@ function getCategories() {
   const filenames = fs.readdirSync(postsDir);
   const categoryCount: Record<string, number> = {};
 
-  filenames.forEach((filename) => {
-    const filePath = path.join(postsDir, filename);
-    const fileContent = fs.readFileSync(filePath, "utf8");
-    const { data } = matter(fileContent);
-    const category = data.category;
-    if (category) {
-      categoryCount[category] = (categoryCount[category] || 0) + 1;
-    }
-  });
+  filenames
+    .filter((filename) => {
+      const filePath = path.join(postsDir, filename);
+      return fs.statSync(filePath).isFile() && filename.endsWith('.md');
+    })
+    .forEach((filename) => {
+      const filePath = path.join(postsDir, filename);
+      const fileContent = fs.readFileSync(filePath, "utf8");
+      const { data } = matter(fileContent);
+      const category = data.category;
+      if (category) {
+        categoryCount[category] = (categoryCount[category] || 0) + 1;
+      }
+    });
 
   return Object.entries(categoryCount).map(([name, count]) => ({ name, count }));
 }
@@ -25,16 +30,21 @@ function getRecentPosts(limit: number = 5) {
   const postsDir = path.join(process.cwd(), "posts");
   const filenames = fs.readdirSync(postsDir);
 
-  const posts = filenames.map((filename) => {
-    const filePath = path.join(postsDir, filename);
-    const fileContent = fs.readFileSync(filePath, "utf8");
-    const { data } = matter(fileContent);
-    return {
-      title: data.title,
-      date: data.date,
-      slug: filename.replace(/\.md$/, ""),
-    };
-  });
+  const posts = filenames
+    .filter((filename) => {
+      const filePath = path.join(postsDir, filename);
+      return fs.statSync(filePath).isFile() && filename.endsWith('.md');
+    })
+    .map((filename) => {
+      const filePath = path.join(postsDir, filename);
+      const fileContent = fs.readFileSync(filePath, "utf8");
+      const { data } = matter(fileContent);
+      return {
+        title: data.title,
+        date: data.date,
+        slug: filename.replace(/\.md$/, ""),
+      };
+    });
 
   return posts
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -55,8 +65,8 @@ export default function Sidebar() {
           height={128}
           className="rounded-full mx-auto"
         />
-        <h2 className="mt-4 text-xl font-bold">PyungSeok Kim</h2>
-        <p className="text-red-500">Backend, Bigdata Engineer</p>
+        <h2 className="mt-4 text-xl font-bold">Kim Pyeong Seok</h2>
+        <p className="text-red-500">The engineer of *</p>
       </div>
 
       <div>

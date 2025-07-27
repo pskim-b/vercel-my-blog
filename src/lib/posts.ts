@@ -13,15 +13,21 @@ export function getAllPosts(): PostMeta[] {
   const postsDir = path.join(process.cwd(), "posts");
   const filenames = fs.readdirSync(postsDir);
 
-  return filenames.map((filename) => {
-    const filePath = path.join(postsDir, filename);
-    const fileContent = fs.readFileSync(filePath, "utf8");
-    const { data } = matter(fileContent);
-    return {
-      title: data.title,
-      date: data.date,
-      category: data.category,
-      slug: filename.replace(/\.md$/, ""),
-    };
-  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return filenames
+    .filter((filename) => {
+      const filePath = path.join(postsDir, filename);
+      return fs.statSync(filePath).isFile() && filename.endsWith('.md');
+    })
+    .map((filename) => {
+      const filePath = path.join(postsDir, filename);
+      const fileContent = fs.readFileSync(filePath, "utf8");
+      const { data } = matter(fileContent);
+      return {
+        title: data.title,
+        date: data.date,
+        category: data.category,
+        slug: filename.replace(/\.md$/, ""),
+      };
+    })
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
