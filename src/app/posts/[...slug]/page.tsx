@@ -1,48 +1,41 @@
-// src/app/posts/[slug]/page.tsx
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
+// src/app/posts/[...slug]/page.tsx
 import { notFound } from "next/navigation";
 import Markdown from "markdown-to-jsx";
 import CodeBlock from "@/components/CodeBlock";
+import { getPostBySlug, getAllPosts } from "@/lib/posts";
 
 export async function generateStaticParams() {
-  const postsDir = path.join(process.cwd(), "posts");
-  const filenames = fs.readdirSync(postsDir);
-
-  return filenames.map((filename) => ({
-    slug: filename.replace(/\.md$/, ""),
+  const posts = getAllPosts();
+  console.log("Generated params:", posts.map(p => p.slug)); // Debug log
+  return posts.map((post) => ({
+    slug: post.slug.split('/'), // Split slug into array for catch-all route
   }));
 }
 
-function getPostContent(slug: string) {
-  const filePath = path.join(process.cwd(), "posts", `${slug}.md`);
-  if (!fs.existsSync(filePath)) return null;
-  const fileContent = fs.readFileSync(filePath, "utf8");
-  const { content, data } = matter(fileContent);
-  return { content, data };
-}
+export default async function PostPage({ params }: { params: Promise<{ slug: string[] }> }) {
+  const slugArray = (await params).slug;
+  const slug = slugArray.join('/'); // Join array back to string
+  console.log("Requested slug:", slug); // Debug log
+  const post = getPostBySlug(slug);
 
-
-export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const slug = (await params).slug
-  const post =  getPostContent(slug);
-
-  if (!post) return notFound();
+  if (!post) {
+    console.log("Post not found for slug:", slug); // Debug log
+    return notFound();
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Post Header with Meta Information */}
       <header className="mb-8 pb-6 border-b border-gray-700">
         <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
-          {post.data.title}
+          {post.meta.title}
         </h1>
         <div className="flex items-center gap-4 text-sm text-gray-400">
-          <time dateTime={post.data.date} className="flex items-center">
+          <time dateTime={post.meta.date} className="flex items-center">
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            {new Date(post.data.date).toLocaleDateString('en-US', {
+            {new Date(post.meta.date).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric'
@@ -53,7 +46,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
             </svg>
             <span className="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium">
-              {post.data.category}
+              {post.meta.category}
             </span>
           </span>
         </div>

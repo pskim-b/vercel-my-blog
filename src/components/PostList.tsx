@@ -6,8 +6,8 @@ interface PostListProps {
 
 export default function PostList({ posts = [] }: PostListProps) {
   return (
-    <div className="h-screen overflow-y-scroll pr-4">
-      <ul className="space-y-4">
+    <div className="h-screen overflow-y-scroll pr-2">
+      <ul className="space-y-2">
         {posts.map((post) => {
           const postData = getPostBySlug(post.slug);
           let contentPreview = '';
