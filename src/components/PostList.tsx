@@ -11,16 +11,16 @@ export default function PostList({ posts = [] }: PostListProps) {
         {posts.map((post) => {
           const postData = getPostBySlug(post.slug);
           let contentPreview = '';
-          
+
           if (postData?.content) {
             // Read until second line break for better preview
             let rawContent = postData.content;
-            let firstLineBreak = postData.content.indexOf('\n');
-            
+            const firstLineBreak = postData.content.indexOf('\n');
+
             if (firstLineBreak !== -1) {
               // Find the second line break
-              let secondLineBreak = postData.content.indexOf('\n', firstLineBreak + 1);
-              
+              const secondLineBreak = postData.content.indexOf('\n', firstLineBreak + 1);
+
               if (secondLineBreak !== -1) {
                 // Take content up to the second line break
                 rawContent = postData.content.substring(0, secondLineBreak);
@@ -37,7 +37,7 @@ export default function PostList({ posts = [] }: PostListProps) {
               .replace(/\r/g, '') // Remove carriage returns
               .replace(/\s+/g, ' ') // Replace multiple spaces with single space
               .trim();
-            
+
             // If still too long, truncate to 150 characters
             if (contentPreview.length > 150) {
               contentPreview = contentPreview.substring(0, 150) + '...';
