@@ -1,5 +1,5 @@
 ---
-title: "[next.js] first project"
+title: "first project"
 date: "2025-05-03"
 category: "nextjs"
 ---
