@@ -43,8 +43,10 @@ function getRecentPosts(limit: number = 5) {
         title: data.title,
         date: data.date,
         slug: filename.replace(/\.md$/, ""),
+        category: data.category,
       };
-    });
+    })
+    .filter(post => post.category !== "memo"); // Only show public posts
 
   return posts
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -52,46 +54,19 @@ function getRecentPosts(limit: number = 5) {
 }
 
 export default function Sidebar() {
-  const categories = getCategories();
-  const recentPosts = getRecentPosts();
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <Image
-          src="/images/profile.jpg"
-          alt="Profile"
-          width={128}
-          height={128}
-          className="rounded-full mx-auto"
-        />
-        <h2 className="mt-4 text-xl font-bold">Kim Pyeong Seok</h2>
-        <p className="text-red-500">The engineer of *</p>
-      </div>
-
-      <div>
-        <h3 className="font-bold border-b pb-1 mb-2">CATEGORY</h3>
-        <ul className="space-y-1 text-sm">
-          {categories.map((cat) => (
-            <li key={cat.name} className="flex justify-between">
-              <span>{cat.name}</span>
-              <span>{cat.count}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <h3 className="font-bold border-b pb-1 mb-2">RECENT POSTS</h3>
-        <ul className="space-y-1 text-sm text-blue-600">
-          {recentPosts.map((post) => (
-            <li key={post.slug}>
-              <a href={`/posts/${post.slug}`} className="hover:underline">
-                {post.title}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <h2 className="text-xl font-bold">Kim Pyeong Seok</h2>
+        <p className="text-gray-400">The engineer of *</p>
+        <p className="text-sm text-gray-500 mt-2">{currentDate}</p>
       </div>
     </div>
   );
