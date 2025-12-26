@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Markdown from "markdown-to-jsx";
 import CodeBlock from "@/components/CodeBlock";
 import { getPostBySlug, getAllPosts } from "@/lib/posts";
+import type { AnchorHTMLAttributes, ImgHTMLAttributes } from "react";
 
 export async function generateStaticParams() {
   const posts = getAllPosts();
@@ -22,6 +23,19 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     console.log("Post not found for slug:", slug); // Debug log
     return notFound();
   }
+
+  const slugSegments = post.meta.slug.split("/");
+  const dirSegments = slugSegments.length > 1 ? slugSegments.slice(0, -1) : [];
+  const encodedDir = dirSegments.map((seg) => encodeURIComponent(seg)).join("/");
+  const postDirBasePath = encodedDir ? `/posts/${encodedDir}` : "/posts";
+
+  const rewriteResourceUrl = (url?: string) => {
+    if (!url) return url;
+    // Posts store assets next to the markdown file at ".../<post-dir>/resource/...".
+    if (url.startsWith("./resource/")) return `${postDirBasePath}/resource/${url.slice("./resource/".length)}`;
+    if (url.startsWith("resource/")) return `${postDirBasePath}/resource/${url.slice("resource/".length)}`;
+    return url;
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -79,9 +93,32 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             pre: { 
               component: CodeBlock,
             },
+            img: {
+              // Rewrite "./resource/..." to "/posts/<slug>/resource/..." so assets can be served from public/
+              component: ({ src, alt, title, className, ...rest }: ImgHTMLAttributes<HTMLImageElement>) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={typeof src === "string" ? rewriteResourceUrl(src) : undefined}
+                  alt={alt ?? ""}
+                  title={title}
+                  loading="lazy"
+                  className={["max-w-full h-auto rounded-lg border border-gray-800 my-6", className]
+                    .filter(Boolean)
+                    .join(" ")}
+                  {...rest}
+                />
+              ),
+            },
             a: { 
-              component: "a", 
-              props: { className: "text-blue-400 hover:text-blue-300 hover:underline font-medium" } 
+              component: ({ href, className, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
+                <a
+                  href={rewriteResourceUrl(href)}
+                  className={["text-blue-400 hover:text-blue-300 hover:underline font-medium", className]
+                    .filter(Boolean)
+                    .join(" ")}
+                  {...rest}
+                />
+              ),
             },
             ul: { 
               component: "ul", 
