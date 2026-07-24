@@ -50,7 +50,19 @@ export default function PostList({ posts = [] }: PostListProps) {
                 <div className="flex justify-between items-start">
                   <div className="text-xs text-gray-500 flex flex-col gap-1 items-start mr-4">
                     <span>{new Date(post.date).toLocaleDateString()}</span>
-                    <span className="bg-gray-800 text-gray-300 px-2 py-0.5 rounded">{post.category}</span>
+                    <span className="bg-gray-800 text-cyan-300 px-2 py-0.5 rounded">{post.category}</span>
+                    {post.label.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {post.label.map((label) => (
+                          <span
+                            key={label}
+                            className="bg-gray-800 text-gray-300 px-2 py-0.5 rounded text-[11px]"
+                          >
+                            {label}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1">
                     <h2 className="text-2xl text-white hover:text-gray-100 font-extrabold mb-2">

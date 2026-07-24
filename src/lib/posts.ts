@@ -7,7 +7,20 @@ export interface PostMeta {
   title: string;
   date: string;
   category: string;
+  label: string[];
   slug: string;
+}
+
+function normalizeLabel(label: unknown): string[] {
+  if (Array.isArray(label)) {
+    return label.filter((item): item is string => typeof item === "string");
+  }
+
+  if (typeof label === "string" && label.trim()) {
+    return [label];
+  }
+
+  return [];
 }
 
 export function getAllPosts(): PostMeta[] {
@@ -27,6 +40,7 @@ export function getAllPosts(): PostMeta[] {
         title: data.title,
         date: data.date,
         category: data.category,
+        label: normalizeLabel(data.label),
         slug,
       };
     })
@@ -68,6 +82,7 @@ export function getPostBySlug(slug: string) {
         title: data.title,
         date: data.date,
         category: data.category,
+        label: normalizeLabel(data.label),
         slug: decodedSlug,
       },
       content,
