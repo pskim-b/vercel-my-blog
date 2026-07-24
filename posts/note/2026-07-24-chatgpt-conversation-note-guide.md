@@ -40,7 +40,7 @@ label:
 
 대화를 마친 뒤 다음처럼 요청한다.
 
-> 방금 대화를 요약해서 `posts/note/`에 Markdown 노트로 저장해줘. 제목과 파일명도 정하고 GitHub에 커밋해줘.
+> 방금 대화를 요약해서 `posts/note/`에 Markdown 노트로 저장해줘. 제목과 파일명을 정하고, front matter의 `label` 목록에 `"ai-generated"`를 넣어 GitHub에 커밋해줘.
 
 특정 관점을 남기고 싶다면 함께 지정한다.
 
