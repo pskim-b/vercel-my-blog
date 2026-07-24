@@ -29,6 +29,8 @@ posts/note/2026-07-24-chatgpt-conversation-note-guide.md
 title: "제목"
 date: "YYYY-MM-DD"
 category: "note"
+label:
+  - "ai-generated"
 ---
 ```
 
@@ -86,10 +88,21 @@ ChatGPT의 대화 이력은 생각을 이어 가는 데 유용하지만, 장기 
 이제부터는 좋은 대화가 끝났을 때, “이 대화를 노트로 저장해줘”라고 말하는 것만으로 생각을 축적한다.
 
 
+## 생성 문서 라벨
+
+AI가 생성해 GitHub에 저장하는 모든 문서에는 아래 라벨을 반드시 넣는다.
+
+```yaml
+label:
+  - "ai-generated"
+```
+
+라벨은 단일 문자열이 아니라 목록이다. 사람이 작성하거나 크게 수정한 문서는 필요에 따라 다른 라벨을 추가할 수 있지만, AI가 생성한 문서에서는 `ai-generated`를 제거하지 않는다.
+
 ## ChatGPT Memory에 저장할 요청
 
 아래 문구를 ChatGPT에 한 번 입력해 이 운영 원칙을 개인화된 기본값으로 저장한다.
 
-> 앞으로 내가 “이 대화를 노트로 저장해줘”라고 말하면, 대화 원문을 그대로 옮기지 말고 핵심 질문, 논의, 결론, 다음 행동, 열린 질문을 중심으로 Markdown 노트를 작성해줘. 노트는 `posts/note/YYYY-MM-DD-주제-slug.md` 형식으로 저장하고, front matter에 `title`, `date`, `category: "note"`를 포함해줘. 개인 정보와 회사 비공개 정보는 제외하거나 일반화하고, GitHub 쓰기 권한이 있으면 `pskim-b/vercel-my-blog`에 커밋해줘. 실제 장기 기록의 기준은 GitHub의 Markdown 노트이며, ChatGPT Memory에는 이 작성·저장 선호만 기억해줘.
+> 앞으로 내가 “이 대화를 노트로 저장해줘”라고 말하면, 대화 원문을 그대로 옮기지 말고 핵심 질문, 논의, 결론, 다음 행동, 열린 질문을 중심으로 Markdown 노트를 작성해줘. 노트는 `posts/note/YYYY-MM-DD-주제-slug.md` 형식으로 저장하고, front matter에 `title`, `date`, `category: "note"`를 포함해줘. 개인 정보와 회사 비공개 정보는 제외하거나 일반화하고, GitHub 쓰기 권한이 있으면 `pskim-b/vercel-my-blog`에 커밋해줘. AI가 생성하는 모든 GitHub 문서에는 \`label\` 목록에 반드시 \`"ai-generated"\`를 넣어줘. 실제 장기 기록의 기준은 GitHub의 Markdown 노트이며, ChatGPT Memory에는 이 작성·저장 선호만 기억해줘.
 
 Memory는 이 선호를 다음 대화에 반영하는 보조 수단이다. 파일 위치, 구체적인 대화 내용, 일별 기록처럼 정확히 보존해야 하는 정보는 Memory가 아니라 GitHub의 Markdown 노트에 남긴다.
