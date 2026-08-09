@@ -1,6 +1,9 @@
 import Header from "@/components/Header";
 import { getAllPosts } from "../lib/posts";
 import PostList from "@/components/PostList";
+import { isAuthenticated } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -25,7 +28,8 @@ export default async function HomePage({
 }: {
   searchParams?: SearchParams;
 }) {
-  const allPosts = getAllPosts();
+  const authenticated = await isAuthenticated();
+  const allPosts = getAllPosts().filter((post) => authenticated || post.isPublic);
   const params = searchParams ? await searchParams : {};
   const selectedCategory = firstParam(params.category);
   const selectedLabel = selectedCategory ? undefined : firstParam(params.label);
@@ -44,7 +48,12 @@ export default async function HomePage({
 
   return (
     <div>
-      <Header categories={categories} labels={labels} activeFilter={activeFilter} />
+      <Header
+        categories={categories}
+        labels={labels}
+        authenticated={authenticated}
+        activeFilter={activeFilter}
+      />
       <main className="max-w-4xl mx-auto p-6">
         <PostList posts={filteredPosts} />
       </main>

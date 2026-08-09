@@ -1,17 +1,12 @@
 // src/app/posts/[...slug]/page.tsx
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Markdown from "markdown-to-jsx";
 import CodeBlock from "@/components/CodeBlock";
-import { getPostBySlug, getAllPosts } from "@/lib/posts";
+import { getPostBySlug } from "@/lib/posts";
+import { isAuthenticated } from "@/lib/auth";
 import type { AnchorHTMLAttributes, ImgHTMLAttributes } from "react";
 
-export async function generateStaticParams() {
-  const posts = getAllPosts();
-  console.log("Generated params:", posts.map(p => p.slug)); // Debug log
-  return posts.map((post) => ({
-    slug: post.slug.split('/'), // Split slug into array for catch-all route
-  }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function PostPage({ params }: { params: Promise<{ slug: string[] }> }) {
   const slugArray = (await params).slug;
@@ -24,21 +19,30 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     return notFound();
   }
 
+  if (!post.meta.isPublic && !(await isAuthenticated())) {
+    redirect(`/login?next=${encodeURIComponent(`/posts/${post.meta.slug}`)}`);
+  }
+
   const slugSegments = post.meta.slug.split("/");
   const dirSegments = slugSegments.length > 1 ? slugSegments.slice(0, -1) : [];
   const encodedDir = dirSegments.map((seg) => encodeURIComponent(seg)).join("/");
-  const postDirBasePath = encodedDir ? `/posts/${encodedDir}` : "/posts";
+  const isPrivate = !post.meta.isPublic;
 
   const rewriteResourceUrl = (url?: string) => {
     if (!url) return url;
-    // Posts store assets next to the markdown file at ".../<post-dir>/resource/...".
-    if (url.startsWith("./resource/")) return `${postDirBasePath}/resource/${url.slice("./resource/".length)}`;
-    if (url.startsWith("resource/")) return `${postDirBasePath}/resource/${url.slice("resource/".length)}`;
+    const assetBasePath = encodedDir ? `/post-assets/${encodedDir}/resource` : "/post-assets/resource";
+    if (url.startsWith("./resource/")) return `${assetBasePath}/${url.slice("./resource/".length)}`;
+    if (url.startsWith("resource/")) return `${assetBasePath}/${url.slice("resource/".length)}`;
     return url;
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div
+      className={`min-h-screen ${
+        isPrivate ? "bg-[radial-gradient(circle_at_top,#3f1111_0,#140606_38%,#000_76%)]" : "bg-black"
+      }`}
+    >
+      <main className="max-w-4xl mx-auto p-6">
       {/* Post Header with Meta Information */}
       <header className="mb-8 pb-6 border-b border-gray-700">
         <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
@@ -63,6 +67,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               {post.meta.category}
             </span>
           </span>
+          {isPrivate && (
+            <span className="rounded-full bg-red-900/60 px-3 py-1 text-xs font-medium text-red-100">
+              private
+            </span>
+          )}
           {post.meta.label.length > 0 && (
             <span className="flex flex-wrap items-center gap-2">
               {post.meta.label.map((label) => (
@@ -79,7 +88,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       </header>
 
       {/* Post Content */}
-      <article className="max-w-none bg-black text-white">
+      <article className={`max-w-none text-white ${isPrivate ? "bg-transparent" : "bg-black"}`}>
         <Markdown options={{
           overrides: {
             h1: { 
@@ -106,7 +115,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               component: CodeBlock,
             },
             img: {
-              // Rewrite "./resource/..." to "/posts/<slug>/resource/..." so assets can be served from public/
+              // Serve post-local resources through the protected asset route.
               component: ({ src, alt, title, className, ...rest }: ImgHTMLAttributes<HTMLImageElement>) => (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -161,6 +170,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           {post.content}
         </Markdown>
       </article>
+      </main>
     </div>
   );
 }

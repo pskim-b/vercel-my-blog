@@ -12,6 +12,7 @@ interface FilterOption {
 interface HeaderProps {
   categories?: FilterOption[];
   labels?: FilterOption[];
+  authenticated?: boolean;
   activeFilter?: {
     type: "category" | "label";
     value: string;
@@ -21,6 +22,7 @@ interface HeaderProps {
 export default function Header({
   categories = [],
   labels = [],
+  authenticated = false,
   activeFilter = null,
 }: HeaderProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -113,6 +115,27 @@ export default function Header({
                   </div>
                 </div>
               )}
+
+              <div className="border-t border-gray-800 pt-4">
+                {authenticated ? (
+                  <form action="/api/auth/logout" method="post">
+                    <button
+                      type="submit"
+                      className="w-full rounded border border-cyan-500/70 bg-gray-900 px-3 py-2 text-left text-sm font-bold uppercase tracking-wide text-cyan-200 transition-colors hover:border-cyan-300 hover:bg-gray-800 hover:text-white"
+                    >
+                      Sign out
+                    </button>
+                  </form>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setIsFilterOpen(false)}
+                    className="block rounded border border-cyan-500/70 bg-gray-900 px-3 py-2 text-sm font-bold uppercase tracking-wide text-cyan-200 transition-colors hover:border-cyan-300 hover:bg-gray-800 hover:text-white"
+                  >
+                    Sign in
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         )}

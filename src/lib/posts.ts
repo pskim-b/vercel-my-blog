@@ -9,6 +9,8 @@ export interface PostMeta {
   category: string;
   label: string[];
   slug: string;
+  scope: "public" | "private";
+  isPublic: boolean;
 }
 
 function normalizeLabel(label: unknown): string[] {
@@ -21,6 +23,34 @@ function normalizeLabel(label: unknown): string[] {
   }
 
   return [];
+}
+
+function normalizeScope(scope: unknown): "public" | "private" {
+  return scope === "public" ? "public" : "private";
+}
+
+function readAllowedFolders(): string[] {
+  const allowPath = path.join(process.cwd(), "posts", "allow.yml");
+
+  if (!fs.existsSync(allowPath)) return [];
+
+  const content = fs.readFileSync(allowPath, "utf8");
+  const folders: string[] = [];
+
+  for (const line of content.split(/\r?\n/)) {
+    const match = line.match(/^\s*-\s*["']?([^"'\s#]+)["']?/);
+    if (match) folders.push(match[1].replace(/^\/+|\/+$/g, ""));
+  }
+
+  return folders.filter(Boolean);
+}
+
+export function isPublicSlug(slug: string, scope?: unknown): boolean {
+  const normalizedSlug = decodeURIComponent(slug).replace(/\\/g, "/");
+  const topLevelFolder = normalizedSlug.split("/")[0];
+
+  if (normalizeScope(scope) === "public") return true;
+  return readAllowedFolders().includes(topLevelFolder);
 }
 
 export function getAllPosts(): PostMeta[] {
@@ -42,6 +72,8 @@ export function getAllPosts(): PostMeta[] {
         category: data.category,
         label: normalizeLabel(data.label),
         slug,
+        scope: normalizeScope(data.scope),
+        isPublic: isPublicSlug(slug, data.scope),
       };
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -84,6 +116,8 @@ export function getPostBySlug(slug: string) {
         category: data.category,
         label: normalizeLabel(data.label),
         slug: decodedSlug,
+        scope: normalizeScope(data.scope),
+        isPublic: isPublicSlug(decodedSlug, data.scope),
       },
       content,
     };

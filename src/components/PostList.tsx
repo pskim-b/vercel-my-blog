@@ -10,6 +10,7 @@ export default function PostList({ posts = [] }: PostListProps) {
       <ul className="space-y-2">
         {posts.map((post) => {
           const postData = getPostBySlug(post.slug);
+          const isPrivate = !post.isPublic;
           let contentPreview = '';
 
           if (postData?.content) {
@@ -46,17 +47,32 @@ export default function PostList({ posts = [] }: PostListProps) {
 
           return (
             <li key={post.slug} className="pb-4">
-              <a href={`/posts/${post.slug}`} className="block bg-black p-4 rounded-lg hover:bg-gray-900 transition-colors">
+              <a
+                href={`/posts/${post.slug}`}
+                className={`block rounded-lg border p-4 transition-colors ${
+                  isPrivate
+                    ? "border-red-950 bg-[radial-gradient(circle_at_top_left,#3f1111_0,#140606_42%,#000_88%)] hover:border-red-900 hover:bg-[radial-gradient(circle_at_top_left,#4a1414_0,#180707_42%,#000_88%)]"
+                    : "border-transparent bg-black hover:bg-gray-900"
+                }`}
+              >
                 <div className="flex justify-between items-start">
                   <div className="text-xs text-gray-500 flex flex-col gap-1 items-start mr-4">
                     <span>{new Date(post.date).toLocaleDateString()}</span>
-                    <span className="bg-gray-800 text-cyan-300 px-2 py-0.5 rounded">{post.category}</span>
+                    <span
+                      className={`px-2 py-0.5 rounded ${
+                        isPrivate ? "bg-red-900/60 text-red-100" : "bg-gray-800 text-cyan-300"
+                      }`}
+                    >
+                      {post.category}
+                    </span>
                     {post.label.length > 0 && (
                       <div className="flex flex-wrap gap-1 pt-1">
                         {post.label.map((label) => (
                           <span
                             key={label}
-                            className="bg-gray-800 text-gray-300 px-2 py-0.5 rounded text-[11px]"
+                            className={`px-2 py-0.5 rounded text-[11px] ${
+                              isPrivate ? "bg-red-900/40 text-red-100" : "bg-gray-800 text-gray-300"
+                            }`}
                           >
                             {label}
                           </span>
