@@ -1,0 +1,131 @@
+<!--
+---
+title: "파일 업로드 아키텍처: 클라이언트에서 CDN까지"
+date: "2026-10-20"
+category: "study"
+label:
+  - "ai-generated"
+description: "Multipart와 Presigned URL부터 파일 검증, 이미지 변환, S3 저장, CloudFront 캐싱, 비동기 정합성 관리까지 파일 업로드 파이프라인의 핵심을 정리합니다."
+scope: public
+---
+-->
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>파일 업로드 아키텍처: 클라이언트에서 CDN까지</title>
+<style>
+:root{color-scheme:light;--ink:#202a35;--muted:#5d6b78;--line:#dce3e8;--soft:#f4f7f9;--blue:#176b87;--blue-soft:#e9f5f8;--code:#17232e}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Noto Sans KR",sans-serif;line-height:1.75;word-break:keep-all}
+.page{width:min(100% - 40px,850px);margin:0 auto}
+header{padding:64px 0 42px;border-bottom:1px solid var(--line)}
+.eyebrow{margin:0 0 12px;color:var(--blue);font-size:.78rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase}
+h1{max-width:760px;margin:0;font-size:clamp(2rem,6vw,3.25rem);line-height:1.2;letter-spacing:-.045em}
+.intro{max-width:720px;margin:22px 0 0;color:var(--muted);font-size:1.08rem}
+main{padding:12px 0 56px}
+section{padding:34px 0;border-bottom:1px solid var(--line)}
+h2{margin:0 0 14px;font-size:1.55rem;line-height:1.35;letter-spacing:-.025em}
+h3{margin:24px 0 8px;font-size:1.08rem}
+p{margin:12px 0}
+.flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin:22px 0;padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--soft)}
+.step{padding:8px 11px;border:1px solid #c8dce3;border-radius:9px;background:#fff;color:#244555;font-size:.88rem;font-weight:700}
+.arrow{color:var(--blue);font-weight:800}
+.callout{margin:18px 0;padding:15px 18px;border-left:4px solid var(--blue);border-radius:0 10px 10px 0;background:var(--blue-soft)}
+.warning{border-left-color:#c58a2c;background:#fbf5e9}
+.table-wrap{overflow-x:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px}
+table{width:100%;min-width:570px;border-collapse:collapse;text-align:left}
+th,td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--soft);font-size:.88rem}
+td{font-size:.92rem}
+tr:last-child td{border-bottom:0}
+pre{overflow-x:auto;margin:16px 0;padding:17px;border-radius:10px;background:var(--code);color:#e1edf5;font:.86rem/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;word-break:normal}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.92em}
+ul,ol{padding-left:1.35rem}
+li{margin:7px 0}
+.summary{margin-top:24px;padding:20px;border:1px solid #c8dce3;border-radius:12px;background:var(--blue-soft)}
+footer{padding:24px 0 44px;color:var(--muted);font-size:.85rem}
+@media(max-width:560px){.page{width:min(100% - 28px,850px)}header{padding-top:42px}section{padding:28px 0}.flow{justify-content:flex-start}.arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+<p class="eyebrow">Architecture Study · AWS / Spring Boot</p>
+<h1>파일 업로드 아키텍처:<br>클라이언트에서 CDN까지</h1>
+<p class="intro">파일 업로드는 바이너리를 전송하는 것으로 끝나지 않습니다. 안전한 검증, 이미지 변환, 원본과 결과물의 저장, CDN 전달, 그리고 각 단계의 실패를 복구하는 방법까지 함께 설계해야 합니다.</p>
+</header>
+<main>
+<section>
+<h2>1. 전체 파이프라인을 먼저 보기</h2>
+<p>일반적인 이미지 처리 흐름은 업로드 방식과 관계없이 비슷합니다. 클라이언트가 파일을 보내면 서버나 워커가 파일을 검증하고, 원본을 보존한 뒤 필요한 크기와 형식의 변환본을 만듭니다. 사용자는 변환이 끝난 결과물을 CDN을 통해 조회합니다.</p>
+<div class="flow" aria-label="파일 업로드 처리 흐름"><span class="step">Client</span><span class="arrow">→</span><span class="step">검증</span><span class="arrow">→</span><span class="step">S3 원본</span><span class="arrow">→</span><span class="step">이미지 변환</span><span class="arrow">→</span><span class="step">S3 변환본</span><span class="arrow">→</span><span class="step">CloudFront</span></div>
+<p>각 구성 요소의 책임을 나누면 설계가 단순해집니다. S3는 객체를 지속적으로 보관하고, 변환 프로세스는 검증과 가공을 담당하며, CloudFront는 요청 경로에 맞는 원본에서 객체를 가져와 캐싱하고 전달합니다.</p>
+</section>
+<section>
+<h2>2. 파일을 서버로 보낼까, S3로 바로 보낼까?</h2>
+<p>업로드 방식은 보통 <code>multipart/form-data</code>를 이용하는 서버 경유 방식과 Presigned URL을 이용하는 S3 직접 업로드 방식으로 나뉩니다. 두 방식 모두 일반적으로 파일 바이너리를 그대로 전송합니다.</p>
+<div class="table-wrap"><table><thead><tr><th>구분</th><th>Multipart 업로드</th><th>Presigned URL</th></tr></thead><tbody>
+<tr><td>파일 경로</td><td>클라이언트 → API 서버 → S3</td><td>클라이언트 → S3</td></tr>
+<tr><td>서버 역할</td><td>파일 수신, 검증, 저장을 직접 처리</td><td>제한된 권한의 업로드 URL 발급 및 완료 확인</td></tr>
+<tr><td>장점</td><td>인증과 검증 흐름을 API 안에서 통제하기 쉬움</td><td>파일 전송 부하를 API 서버에서 줄일 수 있음</td></tr>
+<tr><td>주요 고려 사항</td><td>서버 네트워크와 메모리 사용량, 요청 시간</td><td>만료 시간, 객체 키, CORS, 업로드 후 검증</td></tr>
+</tbody></table></div>
+<h3>HTTP multipart와 S3 Multipart Upload는 다르다</h3>
+<p>이름에 모두 “multipart”가 들어가지만 같은 기능을 뜻하지 않습니다. <code>multipart/form-data</code>는 HTTP 요청 한 번에 파일과 폼 필드를 함께 담는 형식입니다. S3 Multipart Upload는 큰 파일을 여러 파트로 나누어 S3에 전송하는 별도의 업로드 기능입니다.</p>
+<div class="callout"><strong>Base64는 기본 업로드 단계가 아닙니다.</strong> JSON처럼 텍스트 형식으로 바이너리를 전달해야 할 때 선택적으로 사용합니다. Base64 문자열은 원본보다 커지므로, 일반적인 multipart 요청이나 Presigned PUT에서는 파일 바이트를 그대로 보내는 편이 적절합니다.</div>
+<h3>Presigned URL도 업로드 완료를 보장하지 않는다</h3>
+<p>URL을 발급했다는 사실만으로 파일이 S3에 저장되거나 안전하다고 볼 수는 없습니다. 업로드 완료 API에서 객체 존재 여부를 확인하거나, S3 이벤트를 받아 서버가 후속 검증과 처리를 시작해야 합니다.</p>
+</section>
+<section>
+<h2>3. 파일 이름과 MIME 타입만 믿지 않기</h2>
+<p>클라이언트가 보낸 파일명과 Content-Type은 사용자가 제공한 값입니다. 요청 헤더만 보고 이미지라고 판단하면 잘못된 형식이나 위조된 파일을 놓칠 수 있습니다. 검증은 여러 신호를 함께 확인하는 방식으로 구성합니다.</p>
+<ul><li>허용된 파일 형식과 확장자인지 확인합니다.</li><li>파일 크기와 이미지의 가로·세로 및 총 픽셀 수에 제한을 둡니다.</li><li>Magic Bytes 등 파일 내용에 기반한 형식 판별을 수행합니다.</li><li>실제 디코딩 과정에서 파일이 손상되었는지 확인합니다.</li><li>필요한 서비스라면 악성 코드 검사와 메타데이터 정책을 적용합니다.</li></ul>
+<p>원본을 먼저 S3에 저장하는 구조라면 검증이 끝나기 전에는 비공개 격리 경로에 두고, 처리가 끝난 파일만 서비스에서 조회 가능한 상태로 전환하는 방식을 고려할 수 있습니다.</p>
+</section>
+<section>
+<h2>4. 이미지 변환은 Base64 디코딩과 다르다</h2>
+<p>이미지 처리에는 서로 다른 두 가지 디코딩이 등장합니다. Base64 디코딩은 텍스트로 표현된 값을 원래 바이트로 되돌리는 작업입니다. 이미지 디코딩은 JPEG나 PNG 바이트를 읽어 픽셀 데이터로 해석하는 작업입니다. 이미지 파일을 일반적인 바이너리 업로드로 받았다면 Base64 디코딩은 필요하지 않아도 이미지 디코딩은 변환 과정에 필요합니다.</p>
+<pre>원본 바이트
+  → 이미지 디코딩
+  → 방향·색상·메타데이터 정규화
+  → 크롭 또는 리사이즈
+  → JPEG / WebP / AVIF 인코딩
+  → S3 변환본 저장</pre>
+<p>EXIF 회전 정보를 적용하고, 서비스에 필요하지 않은 위치 정보나 메타데이터를 제거하며, 화면 크기에 맞는 썸네일과 중간 크기의 이미지를 만들 수 있습니다. 변환 결과는 원본과 구분되는 키로 저장하면 재처리와 캐시 관리가 쉬워집니다.</p>
+<pre>s3://media-original/reviews/123/original.jpg
+
+s3://media-processed/reviews/123/large.webp
+s3://media-processed/reviews/123/medium.webp
+s3://media-processed/reviews/123/thumb.webp</pre>
+</section>
+<section>
+<h2>5. S3와 CloudFront의 역할 구분</h2>
+<p>S3에 파일을 업로드한다고 해서 CloudFront에 파일을 별도로 등록하는 것은 아닙니다. 일반적인 Pull 방식에서는 CloudFront가 요청을 받았을 때 캐시가 없거나 만료되었다면 설정된 Origin에서 객체를 가져옵니다.</p>
+<ul><li>CloudFront Behavior는 URL 경로 패턴에 따라 Origin을 선택합니다.</li><li>Cache HIT이면 엣지 캐시에서 바로 응답합니다.</li><li>Cache MISS이면 연결된 Origin에서 객체를 읽어 정책에 따라 캐싱합니다.</li><li>S3를 비공개로 유지하고 CloudFront OAC로 접근을 제한할 수 있습니다.</li></ul>
+<div class="callout warning">같은 객체 키의 파일을 덮어쓰면 엣지에 이전 응답이 남을 수 있습니다. 파일 내용이 바뀔 때는 버전이나 해시가 포함된 새 키를 사용하거나, 필요한 경우 CloudFront Invalidation을 수행합니다.</div>
+<p>정리하면 S3는 지속 저장소이고 CloudFront는 경로 기반 전달과 캐시를 담당합니다. 클라이언트에게는 S3 객체 키를 직접 노출하기보다 서비스가 관리하는 CDN URL을 제공하는 편이 운영과 접근 제어에 유리합니다.</p>
+</section>
+<section>
+<h2>6. 업로드 성공과 서비스 사용 가능 상태는 다르다</h2>
+<p>파일 전송이 성공했더라도 검증과 변환은 실패할 수 있습니다. S3와 데이터베이스를 하나의 ACID 트랜잭션으로 묶을 수 없으므로, 각 단계의 상태를 분리해 관리해야 합니다.</p>
+<pre>PENDING_UPLOAD
+  → UPLOADED
+  → PROCESSING
+  → READY
+
+처리 실패 시 → FAILED → 재시도 또는 격리·정리</pre>
+<p>동기 처리는 업로드 요청 안에서 검증과 변환을 끝내므로 흐름이 단순합니다. 다만 파일이 크거나 변환이 오래 걸리면 응답 지연과 서버 자원 사용이 커집니다. 비동기 처리는 S3 이벤트를 SQS에 전달하고 별도의 Worker가 변환하게 하여 확장성을 높일 수 있습니다.</p>
+<p>비동기 구조에서는 이벤트 중복이나 순서 변경이 발생할 수 있습니다. 따라서 같은 이벤트를 다시 받아도 결과가 안전하도록 멱등성을 두고, 재시도·DLQ·실패 객체 정리·미완료 업로드 점검을 함께 설계해야 합니다.</p>
+</section>
+<section>
+<h2>7. 설계 검토 체크리스트</h2>
+<ul><li>파일 크기, 이미지 픽셀 수, 허용 형식에 제한이 있는가?</li><li>클라이언트가 선언한 MIME 타입을 그대로 신뢰하지 않는가?</li><li>원본 파일과 검증 완료된 변환본의 저장 경로가 구분되는가?</li><li>처리 중인 객체가 완료 전에 사용자에게 노출되지 않는가?</li><li>중복 이벤트를 받아도 변환과 상태 갱신이 안전한가?</li><li>실패한 작업을 재시도하거나 운영자가 확인할 수 있는가?</li><li>객체 키 버전 관리와 CDN 캐시 만료 정책이 정해져 있는가?</li></ul>
+<div class="summary"><strong>핵심 요약</strong><p>파일 업로드 파이프라인은 클라이언트의 바이너리 전송에서 시작해 파일 검증, 원본 보존, 이미지 변환, 결과물 저장, CDN 전달로 이어집니다. Multipart는 서버가 파일 흐름을 직접 제어하고, Presigned URL은 클라이언트가 S3에 직접 전송하도록 합니다. S3 저장·변환·서비스 사용 가능 상태는 각각 분리해서 다루며, 비동기 처리에서는 멱등성·재시도·실패 복구가 일관성을 지탱합니다.</p></div>
+</section>
+</main>
+<footer>파일 업로드, 이미지 변환, AWS S3, CloudFront 아키텍처 학습 노트</footer>
+</div>
+</body>
+</html>
