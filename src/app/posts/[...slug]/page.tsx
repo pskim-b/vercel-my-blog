@@ -89,7 +89,16 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
       {/* Post Content */}
       <article className={`max-w-none text-white ${isPrivate ? "bg-transparent" : "bg-black"}`}>
-        <Markdown options={{
+        {post.meta.format === "html" ? (
+          <iframe
+            title={post.meta.title}
+            src={`/html-posts/${post.meta.slug.split("/").map(encodeURIComponent).join("/")}`}
+            sandbox="allow-scripts"
+            referrerPolicy="no-referrer"
+            className="w-full border-0 bg-white"
+            style={{ height: "75vh", minHeight: 480 }}
+          />
+        ) : <Markdown options={{
           overrides: {
             h1: { 
               component: "h1", 
@@ -168,7 +177,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           },
         }}>
           {post.content}
-        </Markdown>
+        </Markdown>}
       </article>
       </main>
     </div>

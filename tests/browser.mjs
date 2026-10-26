@@ -1,0 +1,77 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const { chromium } = require(process.env.PLAYWRIGHT_PATH || "playwright");
+const base = process.env.TEST_URL || "http://localhost:3100";
+assert.ok(["localhost", "127.0.0.1", "[::1]"].includes(new URL(base).hostname), "Run fixture tests against a local server only");
+const fixture = new URL("../posts/__html-test-private.html", import.meta.url);
+const publicFixture = new URL("../posts/study/html-demo.html", import.meta.url);
+const source = fs.readFileSync(new URL("./fixtures/html-demo.html", import.meta.url), "utf8");
+assert.ok(!fs.existsSync(fixture), "Temporary fixture must not overwrite an existing post");
+assert.ok(!fs.existsSync(publicFixture), "Temporary fixture must not overwrite an existing post");
+let browser;
+try {
+  fs.writeFileSync(fixture, source.replace("scope: public", "scope: private"), { flag: "wx" });
+  fs.writeFileSync(publicFixture, source, { flag: "wx" });
+  browser = await chromium.launch({ headless: true });
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto(`${base}/posts/study/html-demo`);
+  await page.getByRole("heading", { name: "HTML interaction demo", exact: true }).waitFor();
+  const frame = page.frameLocator('iframe');
+  await frame.getByRole("button", { name: "Increase count" }).click();
+  assert.equal(await frame.locator("output").textContent(), "1");
+  await frame.getByRole("button", { name: "Decrease count" }).click();
+  assert.equal(await frame.locator("output").textContent(), "0");
+  await frame.getByRole("button", { name: "Increase count" }).click();
+  await frame.getByRole("button", { name: "Reset" }).click();
+  assert.equal(await frame.locator("output").textContent(), "0");
+  const child = page.frames().find(f => f.url().includes("/html-posts/"));
+  assert.equal(await child.evaluate(() => { try { return !!parent.document.body; } catch { return false; } }), false);
+  assert.equal(await child.evaluate(() => { try { localStorage.setItem("test", "1"); return true; } catch { return false; } }), false);
+  assert.equal(await child.evaluate(async () => { try { await fetch("/api/auth/logout", { method: "POST" }); return true; } catch { return false; } }), false);
+  await page.screenshot({ path: "/tmp/blog-html-desktop.png", fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  assert.ok(await child.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  await page.screenshot({ path: "/tmp/blog-html-mobile.png", fullPage: true });
+  const raw = await context.request.get(`${base}/html-posts/study/html-demo`);
+  assert.equal(raw.status(), 200);
+  assert.match(raw.headers()["content-security-policy"], /sandbox allow-scripts/);
+  assert.equal(raw.headers()["cache-control"], "private, no-store");
+  const standalone = await context.newPage();
+  await standalone.goto(`${base}/html-posts/study/html-demo`);
+  await standalone.getByRole("button", { name: "Increase count" }).click();
+  assert.equal(await standalone.locator("output").textContent(), "1");
+  assert.equal(await standalone.evaluate(() => { try { localStorage.setItem("test", "1"); return true; } catch { return false; } }), false);
+  await standalone.close();
+  assert.equal((await context.request.get(`${base}/html-posts/__html-test-private`)).status(), 401);
+  const privatePage = await context.request.get(`${base}/posts/__html-test-private`, { maxRedirects: 0 });
+  assert.equal(privatePage.status(), 307);
+  assert.ok(privatePage.headers().location.startsWith("/login?"));
+  const home = await (await context.request.get(base)).text();
+  assert.ok(!home.includes('/posts/__html-test-private'));
+  assert.ok(home.includes("A self-contained HTML counter"));
+  assert.equal((await context.request.get(`${base}/post-assets/study/html-demo.html`)).status(), 404);
+  assert.equal((await context.request.get(`${base}/post-assets/study/resource/evil.html`)).status(), 404);
+  assert.equal((await context.request.get(`${base}/html-posts/missing`)).status(), 404);
+  assert.equal((await context.request.get(`${base}/html-posts/book/head_first_design_pattern_20260719`)).status(), 404);
+  await page.goto(`${base}/posts/book/head_first_design_pattern_20260719`);
+  assert.equal(await page.locator("iframe").count(), 0);
+  assert.ok(await page.locator("article").textContent());
+  const login = await context.request.post(`${base}/api/auth/login`, {
+    form: { password: "local-html-test", next: "/posts/__html-test-private" }, maxRedirects: 0,
+  });
+  assert.equal(login.status(), 303);
+  assert.equal((await context.request.get(`${base}/html-posts/__html-test-private`)).status(), 200);
+  await page.goto(`${base}/posts/__html-test-private`);
+  await page.frameLocator("iframe").getByRole("button", { name: "Increase count" }).click();
+  assert.equal(await page.frameLocator("iframe").locator("output").textContent(), "1");
+  console.log("PASS: desktop/mobile counter, sandbox DOM/storage/network, headers, public/private routes, login, listing, asset source blocking, Markdown regression");
+} finally {
+  await browser?.close();
+  fs.unlinkSync(fixture);
+  fs.unlinkSync(publicFixture);
+}

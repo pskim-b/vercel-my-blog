@@ -1,0 +1,48 @@
+<!--
+---
+title: "HTML interaction demo"
+date: "2026-10-26"
+category: "study"
+label:
+  - "interactive"
+scope: public
+description: "A self-contained HTML counter with independent styling and sandbox isolation."
+---
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTML counter</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; background: #fff; color: #171717; font: 16px system-ui, sans-serif; }
+    main { max-width: 640px; margin: auto; }
+    h1 { font-size: 28px; overflow-wrap: anywhere; }
+    output { display: block; margin: 24px 0; font-size: 48px; font-variant-numeric: tabular-nums; }
+    .controls { display: flex; flex-wrap: wrap; gap: 12px; }
+    button { min-width: 48px; min-height: 44px; padding: 8px 16px; border: 1px solid #777; border-radius: 4px; background: #f5f5f5; color: #171717; font: inherit; cursor: pointer; }
+    button:focus-visible { outline: 3px solid #00856a; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>HTML counter</h1>
+    <output id="count" aria-live="polite">0</output>
+    <div class="controls">
+      <button id="decrement" aria-label="Decrease count">-</button>
+      <button id="increment" aria-label="Increase count">+</button>
+      <button id="reset">Reset</button>
+    </div>
+  </main>
+  <script>
+    const count = document.querySelector('#count');
+    let value = 0;
+    function update(next) { value = next; count.textContent = String(value); }
+    document.querySelector('#increment').onclick = () => update(value + 1);
+    document.querySelector('#decrement').onclick = () => update(value - 1);
+    document.querySelector('#reset').onclick = () => update(0);
+  </script>
+</body>
+</html>

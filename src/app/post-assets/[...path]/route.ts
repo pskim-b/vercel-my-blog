@@ -56,9 +56,15 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const relativeAssetPath = (await params).path.map(decodeURIComponent).join("/");
+  const relativeAssetPath = (await params).path.join("/");
 
   if (!isSafeRelativePath(relativeAssetPath)) {
+    return new NextResponse("Not found", { status: 404 });
+  }
+
+  // Never expose post sources or executable documents through the asset endpoint.
+  if (!relativeAssetPath.split("/").includes("resource") ||
+      !CONTENT_TYPES[path.extname(relativeAssetPath).toLowerCase()]) {
     return new NextResponse("Not found", { status: 404 });
   }
 
@@ -70,10 +76,16 @@ export async function GET(
 
   const postsDir = path.join(process.cwd(), "posts");
   const filePath = path.join(postsDir, relativeAssetPath);
-  const resolved = path.resolve(filePath);
-  const root = path.resolve(postsDir);
+  let resolved: string;
+  let root: string;
+  try {
+    resolved = await fs.realpath(filePath);
+    root = await fs.realpath(postsDir);
+  } catch {
+    return new NextResponse("Not found", { status: 404 });
+  }
 
-  if (!resolved.startsWith(`${root}${path.sep}`)) {
+  if (!resolved.startsWith(`${root}${path.sep}`) || resolved !== path.join(root, relativeAssetPath)) {
     return new NextResponse("Not found", { status: 404 });
   }
 
@@ -82,7 +94,8 @@ export async function GET(
     return new NextResponse(file, {
       headers: {
         "Content-Type": contentType(resolved),
-        "Cache-Control": "private, max-age=3600",
+        "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch {

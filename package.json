@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "sync:post-assets": "node scripts/sync-post-assets.mjs",
-    "prebuild": "node scripts/sync-post-assets.mjs",
+    "prebuild": "node scripts/validate-posts.mjs && node scripts/sync-post-assets.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.5",

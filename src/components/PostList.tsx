@@ -13,7 +13,9 @@ export default function PostList({ posts = [] }: PostListProps) {
           const isPrivate = !post.isPublic;
           let contentPreview = '';
 
-          if (postData?.content) {
+          if (post.format === "html") {
+            contentPreview = post.description;
+          } else if (postData?.content) {
             // Read until second line break for better preview
             let rawContent = postData.content;
             const firstLineBreak = postData.content.indexOf('\n');

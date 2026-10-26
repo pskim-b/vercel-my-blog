@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
-import matter from "gray-matter";
-import { getAllMarkdownFiles } from "./utils";
+import { contentSlug, parseContent, indexContent } from "./content.mjs";
 
 export interface PostMeta {
   title: string;
@@ -11,6 +10,8 @@ export interface PostMeta {
   slug: string;
   scope: "public" | "private";
   isPublic: boolean;
+  format: "md" | "html";
+  description: string;
 }
 
 function normalizeLabel(label: unknown): string[] {
@@ -46,7 +47,7 @@ function readAllowedFolders(): string[] {
 }
 
 export function isPublicSlug(slug: string, scope?: unknown): boolean {
-  const normalizedSlug = decodeURIComponent(slug).replace(/\\/g, "/");
+  const normalizedSlug = slug.replace(/\\/g, "/");
   const topLevelFolder = normalizedSlug.split("/")[0];
 
   if (normalizeScope(scope) === "public") return true;
@@ -55,16 +56,16 @@ export function isPublicSlug(slug: string, scope?: unknown): boolean {
 
 export function getAllPosts(): PostMeta[] {
   const postsDir = path.join(process.cwd(), "posts");
-  const markdownFiles = getAllMarkdownFiles(postsDir);
+  const markdownFiles = Array.from(indexContent(postsDir).values());
 
   return markdownFiles
     .map((filePath) => {
       const fileContent = fs.readFileSync(filePath, "utf8");
-      const { data } = matter(fileContent);
+      const format: "html" | "md" = filePath.endsWith(".html") ? "html" : "md";
+      const { data } = parseContent(fileContent, format);
       
       // Create slug from relative path to posts directory
-      const relativePath = path.relative(postsDir, filePath);
-      const slug = relativePath.replace(/\.md$/, "").replace(/\\/g, "/"); // Handle Windows paths
+      const slug = contentSlug(postsDir, filePath);
       
       return {
         title: data.title,
@@ -74,6 +75,8 @@ export function getAllPosts(): PostMeta[] {
         slug,
         scope: normalizeScope(data.scope),
         isPublic: isPublicSlug(slug, data.scope),
+        format,
+        description: typeof data.description === "string" ? data.description : "",
       };
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -83,31 +86,19 @@ export function getAllPosts(): PostMeta[] {
 export function getPostBySlug(slug: string) {
   const postsDir = path.join(process.cwd(), "posts");
   
-  // Decode URL-encoded slug
-  const decodedSlug = decodeURIComponent(slug);
+  // Next.js route params have already been decoded.
+  const decodedSlug = slug;
   
-  // Use getAllMarkdownFiles to find the exact file path
-  const markdownFiles = getAllMarkdownFiles(postsDir);
-  
-  // Find the file that matches the slug exactly
-  const targetFile = markdownFiles.find((filePath) => {
-    const relativePath = path.relative(postsDir, filePath);
-    const fileSlug = relativePath.replace(/\.md$/, "").replace(/\\/g, "/");
-    return fileSlug === decodedSlug;
-  });
+  const targetFile = indexContent(postsDir).get(decodedSlug);
   
   if (!targetFile) {
-    console.log(`File not found for slug: ${decodedSlug}`); // Debug log
-    console.log(`Available files:`, markdownFiles.map(fp => {
-      const relativePath = path.relative(postsDir, fp);
-      return relativePath.replace(/\.md$/, "").replace(/\\/g, "/");
-    }));
     return null;
   }
 
   try {
     const fileContent = fs.readFileSync(targetFile, "utf8");
-    const { data, content } = matter(fileContent);
+    const format: "html" | "md" = targetFile.endsWith(".html") ? "html" : "md";
+    const { data, content } = parseContent(fileContent, format);
     
     return {
       meta: {
@@ -118,6 +109,8 @@ export function getPostBySlug(slug: string) {
         slug: decodedSlug,
         scope: normalizeScope(data.scope),
         isPublic: isPublicSlug(decodedSlug, data.scope),
+        format,
+        description: typeof data.description === "string" ? data.description : "",
       },
       content,
     };

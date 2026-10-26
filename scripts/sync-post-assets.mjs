@@ -72,7 +72,15 @@ async function hasPublicPost(dir, postsDir, allowedFolders) {
 async function copyDir(srcDir, destDir) {
   await fs.mkdir(destDir, { recursive: true });
   // Node 20+: fs.cp supports recursive copy
-  await fs.cp(srcDir, destDir, { recursive: true, force: true });
+  await fs.cp(srcDir, destDir, {
+    recursive: true,
+    force: true,
+    filter: async (source) => {
+      const stat = await fs.lstat(source);
+      if (stat.isSymbolicLink()) return false;
+      return stat.isDirectory() || /\.(avif|gif|jpe?g|pdf|png|webp)$/i.test(source);
+    },
+  });
 }
 
 async function main() {

@@ -1,5 +1,41 @@
 # Deployment Guide
 
+## HTML Posts
+
+Markdown remains supported. Add an `.html` file under `posts/` to publish a
+self-contained interactive document. See `tests/fixtures/html-demo.html` for the
+required leading HTML comment containing YAML frontmatter. HTML requires string
+`title`, `date`, `category`, and `description`; quote dates. `label` and `scope`
+follow the Markdown conventions. Visibility defaults to private, except folders
+in `allow.yml`. The extension is omitted from the public post URL.
+
+HTML is served through an authenticated `/html-posts/...` endpoint inside a
+sandboxed iframe. Direct visits retain the same CSP sandbox. Inline CSS and
+JavaScript work; external scripts, CSS, network requests, nested frames, forms,
+shared storage, and parent DOM access are intentionally blocked. Images must use
+data/blob URLs. HTML-local `resource/` files and JS modules are not supported in
+this first version. The frame uses a 75vh viewport (minimum 480px) with internal
+scrolling; automatic height messaging is not enabled.
+
+Do not place a Markdown and HTML post at the same slug. `npm run build` validates
+duplicates and HTML metadata before compiling. Files in `resource/` and symlinks
+are excluded from HTML/Markdown discovery. Deployment traces explicitly include
+the source `posts/` files for server-side reading; they are not public assets.
+
+Only raster images and PDFs are exposed by the resource route or copied to
+`public/posts`. Existing Markdown resource visibility remains directory-based:
+resources shared with a public Markdown post may be public. Never mix private
+resources into such a directory. HTML posts do not make shared resources public.
+
+Run `npm test`, `npm run lint`, and `npm run build` for automated checks.
+For browser integration checks, install Playwright and Chromium separately, run
+the server with `BLOG_AUTH_PASSWORD=local-html-test`, then run
+`node tests/browser.mjs`. Set `PLAYWRIGHT_PATH` to an installed Playwright module
+and `TEST_URL` to override the default `http://localhost:3100`. The browser test
+creates and removes temporary public/private HTML posts on a local server only
+(no demo post is deployed) and writes screenshots to
+`/tmp/blog-html-desktop.png` and `/tmp/blog-html-mobile.png`.
+
 This blog protects posts by default and allows selected public exceptions.
 
 ## Visibility Rules
