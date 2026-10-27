@@ -17,6 +17,7 @@
     "list": "^2.0.19",
     "markdown-to-jsx": "^7.7.6",
     "next": "^15.5.7",
+    "parse5": "^8.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",

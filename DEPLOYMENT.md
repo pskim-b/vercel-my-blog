@@ -9,13 +9,19 @@ required leading HTML comment containing YAML frontmatter. HTML requires string
 follow the Markdown conventions. Visibility defaults to private, except folders
 in `allow.yml`. The extension is omitted from the public post URL.
 
-HTML is served through an authenticated `/html-posts/...` endpoint inside a
-sandboxed iframe. Direct visits retain the same CSP sandbox. Inline CSS and
+HTML posts at `/posts/...` redirect to the authenticated `/html-posts/...`
+endpoint and display as independent documents, without a blog wrapper or iframe.
+The response retains a CSP sandbox. Inline CSS and
 JavaScript work; external scripts, CSS, network requests, nested frames, forms,
 shared storage, and parent DOM access are intentionally blocked. Images must use
 data/blob URLs. HTML-local `resource/` files and JS modules are not supported in
-this first version. The frame uses a 75vh viewport (minimum 480px) with internal
-scrolling; automatic height messaging is not enabled.
+this first version. Documents use the full browser viewport and their own
+scrolling and responsive styles. HTML authors provide their own title and layout.
+The server adds a metadata bar (back link, date, category, labels and private
+status) at the start of the body, isolated using declarative Shadow DOM. Put
+`<psnote-meta></psnote-meta>` inside the body to choose its location instead.
+The source file, styles and scripts are unchanged. Missing description/Open Graph
+head metadata is filled from frontmatter without replacing existing values.
 
 Do not place a Markdown and HTML post at the same slug. `npm run build` validates
 duplicates and HTML metadata before compiling. Files in `resource/` and symlinks

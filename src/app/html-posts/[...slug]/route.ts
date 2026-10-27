@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPostBySlug } from "@/lib/posts";
 import { isAuthenticated } from "@/lib/auth";
+import { injectPostMetadata } from "@/lib/html-document.mjs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
   if (!post.meta.isPublic && !(await isAuthenticated())) {
     return new NextResponse("Authentication required", { status: 401, headers: { "Cache-Control": "no-store" } });
   }
-  return new NextResponse(post.content, {
+  return new NextResponse(injectPostMetadata(post.content, post.meta), {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "private, no-store",
