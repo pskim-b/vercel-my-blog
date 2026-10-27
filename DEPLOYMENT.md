@@ -1,5 +1,16 @@
 # Deployment Guide
 
+## Theme Schedule
+
+Shared blog pages use the light theme from 06:00 to 18:00 in Asia/Seoul and the
+dark theme otherwise, regardless of the visitor's browser timezone. The single
+theme switch at the top of the homepage overrides the schedule until the next
+06:00/18:00 boundary. That selection persists across navigation/reloads when
+local storage is available. Open pages switch automatically and recheck on focus.
+Independent HTML posts retain their original styles and do not inherit this theme.
+Run `node tests/theme-browser.mjs` against a local server to verify scheduling,
+override expiry and both themes; `TEST_URL` and `PLAYWRIGHT_PATH` are supported.
+
 ## HTML Posts
 
 Markdown remains supported. Add an `.html` file under `posts/` to publish a

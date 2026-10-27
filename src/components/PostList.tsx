@@ -1,4 +1,7 @@
 import { PostMeta, getPostBySlug } from "../lib/posts";
+import { compactPreview, textPalette } from "../lib/post-presentation.mjs";
+import type { CSSProperties } from "react";
+import { LockKeyhole } from "lucide-react";
 
 interface PostListProps {
   posts?: PostMeta[];
@@ -11,6 +14,7 @@ export default function PostList({ posts = [] }: PostListProps) {
         {posts.map((post) => {
           const postData = getPostBySlug(post.slug);
           const isPrivate = !post.isPublic;
+          const palette = textPalette(post.category);
           let contentPreview = '';
 
           if (post.format === "html") {
@@ -41,56 +45,68 @@ export default function PostList({ posts = [] }: PostListProps) {
               .replace(/\s+/g, ' ') // Replace multiple spaces with single space
               .trim();
 
-            // If still too long, truncate to 150 characters
-            if (contentPreview.length > 150) {
-              contentPreview = contentPreview.substring(0, 150) + '...';
-            }
           }
+
+          contentPreview = compactPreview(contentPreview);
 
           return (
             <li key={post.slug} className="pb-4">
               <a
                 href={`/posts/${post.slug}`}
-                className={`block rounded-lg border p-4 transition-colors ${
-                  isPrivate
-                    ? "border-red-950 bg-[radial-gradient(circle_at_top_left,#3f1111_0,#140606_42%,#000_88%)] hover:border-red-900 hover:bg-[radial-gradient(circle_at_top_left,#4a1414_0,#180707_42%,#000_88%)]"
-                    : "border-transparent bg-black hover:bg-gray-900"
-                }`}
+                className="post-card block rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-4 transition-colors hover:bg-[var(--card-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                style={{
+                  "--card-bg": palette.background,
+                  "--card-hover": palette.hover,
+                  "--card-border": palette.border,
+                  "--card-light-bg": palette.lightBackground,
+                  "--card-light-hover": palette.lightHover,
+                  "--card-light-border": palette.lightBorder,
+                } as CSSProperties}
               >
-                <div className="flex justify-between items-start">
-                  <div className="text-xs text-gray-500 flex flex-col gap-1 items-start mr-4">
-                    <span>{new Date(post.date).toLocaleDateString()}</span>
+                <div className="mb-3 flex h-6 min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap text-xs text-gray-500">
+                  <time dateTime={post.date} className="shrink-0">
+                    {new Date(post.date).toLocaleDateString()}
+                  </time>
+                  <span
+                    title={post.category}
+                    className="post-tint max-w-24 shrink-0 truncate rounded px-2 py-0.5"
+                    style={{ "--tint-dark": palette.color, "--tint-light": palette.lightColor, backgroundColor: palette.badge } as CSSProperties}
+                  >
+                    {post.category}
+                  </span>
+                  {post.label.length > 0 && (
                     <span
-                      className={`px-2 py-0.5 rounded ${
-                        isPrivate ? "bg-red-900/60 text-red-100" : "bg-gray-800 text-cyan-300"
-                      }`}
+                      title={post.label.join(" · ")}
+                      data-post-labels
+                      className="min-w-0 truncate text-[11px]"
                     >
-                      {post.category}
+                      {post.label.map((label, index) => (
+                        <span key={`${label}-${index}`}>
+                          {index > 0 && <span className="text-gray-600"> · </span>}
+                          <span data-post-label title={label} className="post-tint"
+                            style={{ "--tint-dark": textPalette(label).color, "--tint-light": textPalette(label).lightColor } as CSSProperties}>{label}</span>
+                        </span>
+                      ))}
                     </span>
-                    {post.label.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-1">
-                        {post.label.map((label) => (
-                          <span
-                            key={label}
-                            className={`px-2 py-0.5 rounded text-[11px] ${
-                              isPrivate ? "bg-red-900/40 text-red-100" : "bg-gray-800 text-gray-300"
-                            }`}
-                          >
-                            {label}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h2 className="text-2xl text-white hover:text-gray-100 font-extrabold mb-2">
-                      {post.title}
-                    </h2>
-                    <p className="text-base text-gray-400 mb-3 leading-relaxed font-bold">
-                      {contentPreview}
-                    </p>
-                  </div>
+                  )}
+                  {isPrivate && (
+                    <span
+                      role="img"
+                      aria-label="비공개 글"
+                      title="비공개 글"
+                      className="post-tint ml-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded"
+                      style={{ "--tint-dark": palette.color, "--tint-light": palette.lightColor, backgroundColor: palette.badge } as CSSProperties}
+                    >
+                      <LockKeyhole size={16} strokeWidth={1.8} aria-hidden="true" />
+                    </span>
+                  )}
                 </div>
+                <h2 className="mb-2 break-keep text-2xl font-extrabold text-white [overflow-wrap:anywhere] hover:text-gray-100">
+                  {post.title}
+                </h2>
+                <p className="mb-3 line-clamp-2 break-keep text-base font-normal leading-relaxed text-gray-400 [overflow-wrap:anywhere]">
+                  {contentPreview}
+                </p>
               </a>
             </li>
           );

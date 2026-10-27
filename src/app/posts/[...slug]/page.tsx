@@ -43,7 +43,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div
-      className={`min-h-screen ${
+      className={`markdown-page min-h-screen ${
         isPrivate ? "bg-[radial-gradient(circle_at_top,#3f1111_0,#140606_38%,#000_76%)]" : "bg-black"
       }`}
     >

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import ThemeSwitch from "./ThemeSwitch";
 
 interface FilterOption {
   value: string;
@@ -29,6 +30,7 @@ export default function Header({
 
   return (
     <header className="text-left py-4 px-4 border-b border-gray-700 mt-8">
+      <ThemeSwitch />
       <div className="relative inline-flex items-center gap-1">
         <div className="flex items-center">
           <Link href="/" className="hover:opacity-80 transition-opacity">
@@ -37,7 +39,7 @@ export default function Header({
               alt="The Engineer of Logo"
               width={240}
               height={80}
-              className="object-contain"
+              className="blog-logo object-contain"
               priority
             />
           </Link>

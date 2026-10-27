@@ -3,7 +3,56 @@
 :root {
   --background: #000000;
   --foreground: #ffffff;
+  color-scheme: dark;
 }
+
+:root[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #20242b;
+  color-scheme: light;
+}
+
+.post-tint { color: var(--tint-dark); }
+.theme-switch { color: var(--foreground); }
+.theme-toggle { background: #25313b; border-color: #52616d; }
+.theme-thumb { background: #e8eff4; color: #26343e; }
+:root[data-theme="light"] .theme-toggle { background: #e5eee9; border-color: #a6bbae; }
+:root[data-theme="light"] .theme-thumb { background: #ffffff; color: #946719; }
+:root[data-theme="light"] .post-tint { color: var(--tint-light); }
+:root[data-theme="light"] .post-card {
+  background-color: var(--card-light-bg);
+  border-color: var(--card-light-border);
+}
+:root[data-theme="light"] .post-card:hover { background-color: var(--card-light-hover); }
+:root[data-theme="light"] .blog-logo { filter: invert(1); }
+
+/* Existing Markdown and shared UI use these Tailwind surface/text utilities. */
+:root[data-theme="light"] .bg-black { background-color: #ffffff; }
+:root[data-theme="light"] .bg-gray-900 { background-color: #f3f5f7; }
+:root[data-theme="light"] .bg-gray-800 { background-color: #e7ebef; }
+:root[data-theme="light"] .bg-gray-200 { background-color: #d7dee6; }
+:root[data-theme="light"] .text-white { color: #20242b; }
+:root[data-theme="light"] .text-gray-100,
+:root[data-theme="light"] .text-gray-200,
+:root[data-theme="light"] .text-gray-300 { color: #374151; }
+:root[data-theme="light"] .text-gray-400,
+:root[data-theme="light"] .text-gray-500,
+:root[data-theme="light"] .text-gray-600 { color: #596474; }
+:root[data-theme="light"] .text-cyan-200,
+:root[data-theme="light"] .text-cyan-300 { color: #0e6377; }
+:root[data-theme="light"] .text-teal-400 { color: #087d70; }
+:root[data-theme="light"] .text-blue-400 { color: #1761aa; }
+:root[data-theme="light"] .text-red-100,
+:root[data-theme="light"] .text-red-400 { color: #a12d36; }
+:root[data-theme="light"] .border-gray-700,
+:root[data-theme="light"] .border-gray-800 { border-color: #d7dee6; }
+:root[data-theme="light"] .hover\:bg-gray-900:hover,
+:root[data-theme="light"] .hover\:bg-gray-800:hover,
+:root[data-theme="light"] .hover\:bg-gray-700:hover { background-color: #e7ebef; }
+:root[data-theme="light"] .hover\:text-white:hover,
+:root[data-theme="light"] .hover\:text-gray-100:hover { color: #20242b; }
+:root[data-theme="light"] .markdown-page { background: #ffffff; }
+:root[data-theme="light"] .focus-visible\:outline-white:focus-visible { outline-color: #20242b; }
 
 @theme inline {
   --color-background: var(--background);
