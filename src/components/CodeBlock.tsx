@@ -1,36 +1,30 @@
-import React from 'react';
+import { Children, isValidElement, type ReactNode } from 'react';
+import { highlightCode } from '@/lib/code-highlight.mjs';
 
 interface CodeBlockProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
-export default function CodeBlock({ children, className = '' }: CodeBlockProps) {
-  return (
-    <div className={`bg-gray-900 rounded-xl border border-gray-700 shadow-lg overflow-hidden mb-6 ${className}`}>
-      {/* IDE-like header bar */}
-      <div className="flex items-center justify-between bg-gray-800 px-4 py-2 border-b border-gray-700">
-        <div className="flex items-center space-x-2">
-          <div className="flex space-x-1">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-          </div>
-          <span className="text-gray-400 text-xs font-medium ml-2">Terminal</span>
-        </div>
-        <div className="text-gray-500 text-xs">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-        </div>
-      </div>
+function codeText(node: ReactNode): string {
+  return Children.toArray(node).map(child => {
+    if (typeof child === 'string' || typeof child === 'number') return String(child);
+    if (isValidElement<{ children?: ReactNode }>(child)) return codeText(child.props.children);
+    return '';
+  }).join('');
+}
 
-      {/* Code content */}
-      <div className="p-6">
-        <pre className="text-gray-100 text-sm font-mono leading-relaxed overflow-x-auto">
-          {children}
-        </pre>
-      </div>
-    </div>
+export default async function CodeBlock({ children, className = '' }: CodeBlockProps) {
+  const code = Children.toArray(children).find(isValidElement);
+  const codeClass = isValidElement<{ className?: string }>(code) ? code.props.className ?? '' : '';
+  const language = /(?:^|\s)lang(?:uage)?-([^\s]+)/.exec(`${className} ${codeClass}`)?.[1] ?? '';
+  const html = await highlightCode(codeText(children), language);
+
+  return (
+    <figure className="code-block">
+      {language && <figcaption className="code-block-language">{language}</figcaption>}
+      {/* Only Shiki's escaped, server-generated markup is inserted here. */}
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+    </figure>
   );
-} 
+}

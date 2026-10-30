@@ -69,3 +69,95 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Inline snippets and fenced code have separate surfaces and spacing. */
+.markdown-content {
+  min-width: 0;
+}
+
+.markdown-content :not(pre) > .inline-code {
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  background: #202832;
+  color: #dbe7f3;
+  font-family: var(--font-geist-mono), Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  overflow-wrap: anywhere;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.code-block {
+  margin: 1.5rem 0;
+  overflow: hidden;
+  border: 1px solid #303b49;
+  border-radius: 8px;
+  background: #0d1117;
+}
+
+.code-block-language {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #303b49;
+  color: #a9b6c5;
+  font-family: var(--font-geist-mono), Menlo, Consolas, monospace;
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.code-block .shiki {
+  margin: 0;
+  padding: 1rem;
+  max-width: 100%;
+  overflow-x: auto;
+  color: var(--shiki-dark);
+  background: var(--shiki-dark-bg);
+  font-family: var(--font-geist-mono), Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  tab-size: 2;
+  white-space: pre;
+  -webkit-text-size-adjust: 100%;
+}
+
+.code-block .shiki code {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+}
+
+.code-block .shiki span {
+  color: var(--shiki-dark);
+}
+
+.code-block .shiki:focus-visible {
+  outline: 2px solid #58a6ff;
+  outline-offset: -2px;
+}
+
+:root[data-theme="light"] .markdown-content :not(pre) > .inline-code {
+  background: #eff1f4;
+  color: #344054;
+}
+
+:root[data-theme="light"] .code-block {
+  border-color: #d8dee6;
+  background: #ffffff;
+}
+
+:root[data-theme="light"] .code-block-language {
+  border-color: #d8dee6;
+  color: #57606a;
+  background: #f6f8fa;
+}
+
+:root[data-theme="light"] .code-block .shiki,
+:root[data-theme="light"] .code-block .shiki span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+@media (max-width: 480px) {
+  .code-block .shiki { padding: 0.875rem; font-size: 0.75rem; }
+}

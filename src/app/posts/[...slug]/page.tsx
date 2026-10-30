@@ -93,7 +93,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       </header>
 
       {/* Post Content */}
-      <article className={`max-w-none text-white ${isPrivate ? "bg-transparent" : "bg-black"}`}>
+      <article className={`markdown-content max-w-none text-white ${isPrivate ? "bg-transparent" : "bg-black"}`}>
         <Markdown options={{
           overrides: {
             h1: { 
@@ -114,7 +114,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             },
             code: { 
               component: "code", 
-              props: { className: "bg-gray-800 text-gray-200 px-2 py-1 rounded-md text-sm font-mono border border-gray-700 shadow-sm" } 
+              props: { className: "inline-code" }
             },
             pre: { 
               component: CodeBlock,
