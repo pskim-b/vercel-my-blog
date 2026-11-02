@@ -1,10 +1,9 @@
 import { readFileSync } from "fs";
 import fs from "fs/promises";
 import path from "path";
-import matter from "gray-matter";
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { getAllMarkdownFiles } from "@/lib/utils";
+import { getContentFiles, parseContent } from "@/lib/content.mjs";
 import { isPublicSlug } from "@/lib/posts";
 
 export const runtime = "nodejs";
@@ -34,21 +33,22 @@ function isPublicAsset(relativeAssetPath: string) {
   if (resourceIndex <= 0) return false;
 
   const assetDir = normalized.split("/").slice(0, resourceIndex).join("/");
-  if (isPublicSlug(`${assetDir}/asset-probe.md`)) return true;
 
   const postsDir = path.join(process.cwd(), "posts");
   let markdownFiles: string[] = [];
   try {
-    markdownFiles = getAllMarkdownFiles(path.join(postsDir, assetDir));
+    markdownFiles = getContentFiles(path.join(postsDir, assetDir));
   } catch {
     return false;
   }
 
   return markdownFiles.some((filePath) => {
     const fileContent = readFileSync(filePath, "utf8");
-    const { data } = matter(fileContent);
-    const slug = path.relative(postsDir, filePath).replace(/\.md$/, "").replace(/\\/g, "/");
-    return isPublicSlug(slug, data.scope);
+    const { data, content } = parseContent(fileContent, filePath.endsWith(".html") ? "html" : "md");
+    const slug = path.relative(postsDir, filePath).replace(/\.(md|html)$/, "").replace(/\\/g, "/");
+    const reference = path.posix.relative(path.posix.dirname(slug), normalized);
+    return isPublicSlug(slug, data.scope, data) &&
+      [reference, encodeURI(reference)].some(value => content.includes(value));
   });
 }
 

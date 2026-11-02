@@ -2,6 +2,8 @@
 title: "[Note] Illusion Of Knowledge"
 date: "2026-07-19"
 category: "note"
+label:
+  - "learning"
 ---
 
 지식을 습득함에 있어서 어려운 부분은, 단순하게 지식의 습득 그 자체에서 오는 것이 아니다.

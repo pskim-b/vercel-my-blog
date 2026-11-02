@@ -4,6 +4,7 @@ date: "2026-08-23"
 category: "note"
 label:
   - "ai-generated"
+  - "health"
 ---
 
 # 콜라겐과 레티놀을 이용한 피부 관리 정리

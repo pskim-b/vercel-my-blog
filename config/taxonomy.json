@@ -8,7 +8,8 @@
       "description": "토픽별로 정리한 기술 지식",
       "requires": [
         "topicPaths"
-      ]
+      ],
+      "access": "public"
     },
     {
       "id": "reflections",
@@ -17,7 +18,8 @@
       "description": "책과 영화, 전시와 공연, 맛집의 기록",
       "requires": [
         "type"
-      ]
+      ],
+      "access": "public"
     },
     {
       "id": "writing",
@@ -26,7 +28,8 @@
       "description": "프로젝트별 자료와 원고",
       "requires": [
         "type"
-      ]
+      ],
+      "access": "public"
     },
     {
       "id": "exercise",
@@ -35,21 +38,32 @@
       "description": "시간순으로 돌아보는 운동 기록",
       "requires": [
         "type"
-      ]
+      ],
+      "access": "public"
     },
     {
       "id": "journal",
       "title": "일기",
       "view": "month-timeline",
       "description": "일상과 개인적인 배움의 기록",
-      "requires": []
+      "requires": [],
+      "access": "authenticated"
+    },
+    {
+      "id": "parenting",
+      "title": "육아",
+      "view": "family-timeline",
+      "description": "아이와 부모가 함께 배우고 자라는 기록",
+      "requires": [],
+      "access": "public"
     },
     {
       "id": "unclassified",
-      "title": "미분류",
+      "title": "적바림",
       "view": "review-list",
-      "description": "분류를 보완하고 라벨링할 글",
-      "requires": []
+      "description": "아직 자리를 정하지 않은 자료와 생각을 적어둡니다.",
+      "requires": [],
+      "access": "public"
     }
   ],
   "labelsBySection": {
@@ -288,6 +302,30 @@
           "topicPaths": [
             "tooling/git"
           ]
+        },
+        "engineering-management": {
+          "title": "엔지니어링 매니지먼트",
+          "topicPaths": [
+            "engineering-management"
+          ]
+        },
+        "management-feedback": {
+          "title": "피드백과 의사결정",
+          "topicPaths": [
+            "engineering-management/feedback"
+          ]
+        },
+        "incident-accountability": {
+          "title": "인시던트와 책임",
+          "topicPaths": [
+            "engineering-management/operations/accountability"
+          ]
+        },
+        "team-delivery": {
+          "title": "팀의 실행과 전달",
+          "topicPaths": [
+            "engineering-management/delivery"
+          ]
         }
       },
       "legacyCategories": {
@@ -375,6 +413,9 @@
         },
         "poetry": {
           "title": "시 모음"
+        },
+        "management-essays": {
+          "title": "매니저의 사유"
         }
       },
       "labels": {
@@ -404,6 +445,10 @@
         "project:poetry": {
           "title": "시 모음 프로젝트",
           "type": "poetry"
+        },
+        "project:management-essays": {
+          "title": "매니저의 사유 프로젝트",
+          "type": "management-essays"
         }
       },
       "legacyCategories": {
@@ -513,6 +558,18 @@
       "types": {},
       "labels": {},
       "legacyCategories": {}
+    },
+    "parenting": {
+      "types": {},
+      "labels": {
+        "parenting": {
+          "title": "육아",
+          "aliases": [
+            "육아"
+          ]
+        }
+      },
+      "legacyCategories": {}
     }
   },
   "sharedLabels": {
@@ -539,6 +596,22 @@
     "feedback": {
       "title": "피드백",
       "description": "글의 대분류를 단독으로 결정하지 않는 주제",
+      "role": "supplementary"
+    },
+    "running-related": {
+      "title": "달리기에 관한 일상",
+      "role": "supplementary"
+    },
+    "health": {
+      "title": "건강 참고",
+      "role": "supplementary"
+    },
+    "product-research": {
+      "title": "제품 비교 자료",
+      "role": "supplementary"
+    },
+    "learning": {
+      "title": "배움과 메타인지",
       "role": "supplementary"
     }
   }

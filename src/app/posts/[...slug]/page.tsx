@@ -4,6 +4,8 @@ import Markdown from "markdown-to-jsx";
 import CodeBlock from "@/components/CodeBlock";
 import { getPostBySlug } from "@/lib/posts";
 import { isAuthenticated } from "@/lib/auth";
+import { classifyPost, taxonomySections } from "@/lib/taxonomy.mjs";
+import Link from "next/link";
 import type { AnchorHTMLAttributes, ImgHTMLAttributes } from "react";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +34,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const dirSegments = slugSegments.length > 1 ? slugSegments.slice(0, -1) : [];
   const encodedDir = dirSegments.map((seg) => encodeURIComponent(seg)).join("/");
   const isPrivate = !post.meta.isPublic;
+  const section = classifyPost(post.meta).section;
+  const sectionTitle = taxonomySections.find(item => item.id === section)?.title;
 
   const rewriteResourceUrl = (url?: string) => {
     if (!url) return url;
@@ -43,11 +47,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div
-      className={`markdown-page min-h-screen ${
-        isPrivate ? "bg-[radial-gradient(circle_at_top,#3f1111_0,#140606_38%,#000_76%)]" : "bg-black"
-      }`}
+      className="markdown-page blog-shell themed-post min-h-screen"
+      data-section-theme={section}
     >
       <main className="max-w-4xl mx-auto p-6">
+      <Link className="post-section-back" href={{ pathname: "/", query: { section } }}>← {sectionTitle} 목록</Link>
       {/* Post Header with Meta Information */}
       <header className="mb-8 pb-6 border-b border-gray-700">
         <h1 className="text-4xl font-bold text-white mb-4 leading-tight">

@@ -4,6 +4,7 @@ date: "2026-08-03"
 category: "note"
 label:
   - "ai-generated"
+  - "health"
 ---
 
 # 주사(Rosacea): 증상과 생활 관리 요약

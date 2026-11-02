@@ -28,11 +28,11 @@ try {
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
-  const fixtureLinks = async () => page.locator('main a[href^="/posts/__taxonomy-test-"]').evaluateAll(links => links.map(link => link.getAttribute("href")).sort());
+  const fixtureLinks = async () => page.locator('main a[href^="/posts/__taxonomy-test-"]').evaluateAll(links => [...new Set(links.map(link => link.getAttribute("href")))].sort());
   for (const width of [320, 390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto(`${base}/?section=unclassified`);
-    assert.equal(await page.getByRole("heading", { name: "미분류", exact: true }).count(), 1);
+    assert.equal(await page.getByRole("heading", { name: "적바림", exact: true }).count(), 1);
     const tabs = page.getByRole("navigation", { name: "글 대분류" });
     assert.equal(await tabs.locator("a").count(), 7);
     assert.equal(await tabs.locator('a[aria-current="page"]').getAttribute("href"), "/?section=unclassified");

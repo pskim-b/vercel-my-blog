@@ -4,6 +4,7 @@ date: "2026-09-27"
 category: "running"
 label:
   - "ai-generated"
+activityDate: "2026-09-26"
 ---
 
 # 2026-09-26 러닝 기록

@@ -6,6 +6,7 @@ label:
   - "ai-generated"
   - "chatlog"
   - "writing"
+  - "project:writing-and-thought"
 ---
 
 # 글쓰기와 사유 — 문체, 일기, 에세이

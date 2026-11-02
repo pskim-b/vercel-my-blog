@@ -5,6 +5,7 @@ category: "note"
 label:
   - "ai-generated"
   - "clip"
+  - "parenting"
 ---
 
 # 둘째 아이를 낳는 것은 남자의 인생을 어떻게 무너뜨리는가.

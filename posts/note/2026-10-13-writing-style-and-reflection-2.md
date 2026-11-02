@@ -7,6 +7,7 @@ label:
   - "ai-generated"
   - "chat-log"
   - "writting"
+  - "project:writing-and-thought"
 ---
 
 # 글쓰기와 사유에 대한 탐색

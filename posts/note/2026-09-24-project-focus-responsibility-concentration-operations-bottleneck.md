@@ -4,6 +4,7 @@ date: "2026-09-24"
 category: "note"
 label:
   - "ai-generated"
+  - "team-delivery"
 ---
 
 # 상위 매니저 커뮤니케이션 정리

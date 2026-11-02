@@ -5,6 +5,7 @@ category: "note"
 scope: "public"
 label:
   - "ai-generated"
+  - "agent-context"
 ---
 
 # 1편. Context를 잘 정리해두면 Coding Agent는 알아서 찾아갈까?

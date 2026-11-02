@@ -4,6 +4,7 @@ date: "2026-09-24"
 category: "note"
 label:
   - "ai-generated"
+  - "team-delivery"
 ---
 
 ## 1. 현재 팀의 상황

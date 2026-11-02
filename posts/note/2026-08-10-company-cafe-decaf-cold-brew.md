@@ -5,6 +5,7 @@ category: "note"
 scope: "public"
 label:
   - "ai-generated"
+  - "restaurant"
 ---
 
 # 사내카페 — 디카페인 콜드브루

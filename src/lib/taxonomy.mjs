@@ -25,6 +25,7 @@ export function validateTaxonomy(config) {
     }
     if (sections.has(section.id)) errors.push(`duplicate section: ${section.id}`);
     sections.add(section.id);
+    if (section.access !== undefined && !["public", "authenticated"].includes(section.access)) errors.push(`${section.id}: access must be public or authenticated`);
     if (!Array.isArray(section.requires) || section.requires.some(field => !["type", "topicPaths"].includes(field))) errors.push(`${section.id}: requires supports type and topicPaths`);
     if (!has(config.labelsBySection, section.id)) errors.push(`${section.id}: labelsBySection entry is required`);
   }
@@ -138,10 +139,21 @@ export function createTaxonomy(config) {
     if (issues.length) section = "unclassified";
     return { section, type, labels, topicPaths, candidates, issues, unknownLabels };
   }
-  return { normalizeLabel, normalizeLabels, classifyPost, labelDefinitions: Object.fromEntries(definitions) };
+  function canAccessSection(sectionId, authenticated = false) {
+    const section = sections.get(sectionId);
+    return Boolean(section && (authenticated || section.access !== "authenticated"));
+  }
+  function canAccessPost(post, authenticated = false) {
+    if (authenticated) return true;
+    if (!post.isPublic) return false;
+    const result = classifyPost(post);
+    // Conflicting or incomplete labels must not move restricted content into a public fallback.
+    return [result.section, ...result.candidates].every(id => canAccessSection(id, false));
+  }
+  return { normalizeLabel, normalizeLabels, classifyPost, canAccessSection, canAccessPost, labelDefinitions: Object.fromEntries(definitions) };
 }
 
 const classifier = createTaxonomy(taxonomy);
-export const { normalizeLabel, normalizeLabels, classifyPost, labelDefinitions } = classifier;
+export const { normalizeLabel, normalizeLabels, classifyPost, canAccessSection, canAccessPost, labelDefinitions } = classifier;
 export const taxonomySections = taxonomy.sections;
 export { taxonomy };

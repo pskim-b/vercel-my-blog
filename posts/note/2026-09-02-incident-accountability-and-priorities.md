@@ -4,6 +4,7 @@ date: "2026-09-02"
 category: "note"
 label:
   - "ai-generated"
+  - "incident-accountability"
 ---
 
 # 반복되는 인시던트와 기술 부채를 대하는 태도

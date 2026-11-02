@@ -2,6 +2,25 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { classifyPost, createTaxonomy, taxonomy, validateTaxonomy } from "../src/lib/taxonomy.mjs";
 
+test("section access is configured in taxonomy and applies even to public posts and conflicts", () => {
+  const classifier = createTaxonomy(taxonomy);
+  assert.equal(classifier.canAccessSection("journal", false), false);
+  assert.equal(classifier.canAccessSection("journal", true), true);
+  assert.equal(classifier.canAccessSection("tech", false), true);
+  assert.equal(classifier.canAccessSection("unknown", false), false);
+  const post = { isPublic: true, label: ["journal"] };
+  assert.equal(classifier.canAccessPost(post, false), false);
+  assert.equal(classifier.canAccessPost(post, true), true);
+  assert.equal(classifier.canAccessPost({ ...post, label: ["journal", "kafka"] }, false), false);
+  assert.equal(classifier.canAccessPost({ isPublic: false, label: ["kafka"] }, false), false);
+  const publicJournal = structuredClone(taxonomy);
+  publicJournal.sections.find(section => section.id === "journal").access = "public";
+  assert.equal(createTaxonomy(publicJournal).canAccessPost(post, false), true);
+  const invalid = structuredClone(taxonomy);
+  invalid.sections[0].access = "sometimes";
+  assert.ok(validateTaxonomy(invalid).some(error => error.includes("access")));
+});
+
 test("source metadata alone never makes an AI technology post", () => {
   const result = classifyPost({ category: "note", label: ["ai-generated", "chat-log", "idea", "clip", "feedback"] });
   assert.equal(result.section, "unclassified");

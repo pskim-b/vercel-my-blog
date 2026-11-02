@@ -4,6 +4,7 @@ date: "2026-08-13"
 category: "note"
 label:
   - "ai-generated"
+  - "architecture-rules"
 ---
 
 # Architecture Checker

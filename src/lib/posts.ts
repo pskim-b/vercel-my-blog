@@ -2,10 +2,12 @@ import fs from "fs";
 import path from "path";
 import { contentSlug, parseContent, indexContent } from "./content.mjs";
 import { normalizeLabels } from "./labels.mjs";
+import { canAccessPost } from "./taxonomy.mjs";
 
 export interface PostMeta {
   title: string;
   date: string;
+  activityDate?: string;
   category: string;
   label: string[];
   slug: string;
@@ -14,7 +16,6 @@ export interface PostMeta {
   format: "md" | "html";
   description: string;
 }
-
 
 function normalizeScope(scope: unknown): "public" | "private" {
   return scope === "public" ? "public" : "private";
@@ -36,12 +37,17 @@ function readAllowedFolders(): string[] {
   return folders.filter(Boolean);
 }
 
-export function isPublicSlug(slug: string, scope?: unknown): boolean {
+export function isPublicSlug(slug: string, scope?: unknown, metadata?: Record<string, unknown>): boolean {
   const normalizedSlug = slug.replace(/\\/g, "/");
   const topLevelFolder = normalizedSlug.split("/")[0];
 
-  if (normalizeScope(scope) === "public") return true;
-  return readAllowedFolders().includes(topLevelFolder);
+  if (!metadata) {
+    const file = indexContent(path.join(process.cwd(), "posts")).get(normalizedSlug);
+    if (!file) return false;
+    metadata = parseContent(fs.readFileSync(file, "utf8"), file.endsWith(".html") ? "html" : "md").data;
+  }
+  const publicSource = normalizeScope(scope ?? metadata?.scope) === "public" || readAllowedFolders().includes(topLevelFolder);
+  return publicSource && canAccessPost({ ...metadata, isPublic: true }, false);
 }
 
 export function getAllPosts(): PostMeta[] {
@@ -60,11 +66,12 @@ export function getAllPosts(): PostMeta[] {
       return {
         title: data.title,
         date: data.date,
+        activityDate: typeof data.activityDate === "string" ? data.activityDate : undefined,
         category: data.category,
         label: normalizeLabels(data.label),
         slug,
         scope: normalizeScope(data.scope),
-        isPublic: isPublicSlug(slug, data.scope),
+        isPublic: isPublicSlug(slug, data.scope, data),
         format,
         description: typeof data.description === "string" ? data.description : "",
       };
@@ -94,11 +101,12 @@ export function getPostBySlug(slug: string) {
       meta: {
         title: data.title,
         date: data.date,
+        activityDate: typeof data.activityDate === "string" ? data.activityDate : undefined,
         category: data.category,
         label: normalizeLabels(data.label),
         slug: decodedSlug,
         scope: normalizeScope(data.scope),
-        isPublic: isPublicSlug(decodedSlug, data.scope),
+        isPublic: isPublicSlug(decodedSlug, data.scope, data),
         format,
         description: typeof data.description === "string" ? data.description : "",
       },

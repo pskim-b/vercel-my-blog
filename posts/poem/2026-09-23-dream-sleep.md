@@ -4,6 +4,7 @@ date: "2026-09-23"
 category: "poem"
 label:
   - "ai-generated"
+  - "project:poetry"
 ---
 
 내 품에 안겨 잠이든 아기

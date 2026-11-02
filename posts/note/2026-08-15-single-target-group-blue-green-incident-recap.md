@@ -4,6 +4,7 @@ date: "2026-08-15"
 category: "note"
 label:
   - "ai-generated"
+  - "blue-green"
 ---
 
 ## 1. 전체 요약

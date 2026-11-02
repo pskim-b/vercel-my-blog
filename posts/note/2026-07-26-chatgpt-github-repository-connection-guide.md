@@ -4,6 +4,8 @@ date: "2026-07-26"
 category: "note"
 label:
   - "ai-generated"
+  - "ai-workflow"
+  - "git"
 ---
 
 ChatGPT에서 대화를 블로그 노트로 발행하려면, 노트 작성 규칙과 GitHub 쓰기 권한이 모두 필요하다. `psnote` 스킬은 문서를 어떤 형식으로 만들지 결정하고, GitHub 앱은 실제 저장소에 파일을 만들고 커밋하는 역할을 한다.

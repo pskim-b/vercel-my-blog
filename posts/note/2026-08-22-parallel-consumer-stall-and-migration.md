@@ -4,6 +4,7 @@ date: "2026-08-22"
 category: "note"
 label:
   - "ai-generated"
+  - "kafka-rebalancing"
 ---
 
 ## 요약

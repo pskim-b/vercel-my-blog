@@ -4,6 +4,7 @@ date: "2026-07-24"
 category: "note"
 label:
   - "ai-generated"
+  - "ai-workflow"
 ---
 
 ChatGPT와 나눈 대화 중 나중에 다시 참고할 만한 내용은 대화 이력에만 남기지 않고, 블로그 저장소의 Markdown 노트로 남긴다. 대화는 생각을 펼치는 공간이고, 노트는 검토한 생각과 결정이 남는 기준 기록이다.

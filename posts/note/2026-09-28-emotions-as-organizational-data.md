@@ -5,6 +5,7 @@ category: "note"
 label:
   - "Writing"
   - "idea"
+  - "project:management-essays"
 ---
 
 조직에서 감정을 다루기 위한 방법론에 대한 아이디어다. 이것을 몸소 실행해보고 구체적 글쓰기를 들어갈 것이다
