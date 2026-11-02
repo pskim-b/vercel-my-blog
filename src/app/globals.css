@@ -1,5 +1,41 @@
 @import "tailwindcss";
 
+.section-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground) 20%, transparent);
+  margin-bottom: 1.5rem;
+}
+.section-tabs a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 5px;
+  color: var(--foreground);
+  text-decoration: none;
+}
+.section-tabs a:hover,
+.section-tabs a[aria-current="page"] {
+  background: color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+.section-tabs a[aria-current="page"] { font-weight: 700; }
+.section-tabs a span { font-size: 0.75rem; opacity: 0.65; }
+.section-heading { margin-bottom: 1.5rem; }
+.section-heading h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+.section-heading p { color: color-mix(in srgb, var(--foreground) 70%, transparent); font-size: 0.875rem; margin-top: 0.35rem; }
+.classification-issues {
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 20%, transparent);
+  padding-top: 0.75rem;
+  color: color-mix(in srgb, var(--foreground) 78%, transparent);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.classification-issues span { display: block; margin-top: 0.25rem; }
+
 :root {
   --background: #000000;
   --foreground: #ffffff;
@@ -161,3 +197,46 @@ body {
 @media (max-width: 480px) {
   .code-block .shiki { padding: 0.875rem; font-size: 0.75rem; }
 }
+
+.archive-index {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #303b49;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.archive-index nav a {
+  padding: 0.25rem 0.625rem;
+  border: 1px solid #52616d;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.archive-index nav a:hover,
+.archive-index nav a[aria-current="page"] {
+  border-color: currentColor;
+  background: #25313b;
+}
+
+.archive-date-pointer {
+  font-family: var(--font-geist-mono), Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.archive-year-heading {
+  padding: 0.5rem 0 1rem;
+  color: var(--foreground);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+:root[data-theme="light"] .archive-index { border-color: #d8dee6; }
+:root[data-theme="light"] .archive-index nav a { border-color: #c3ced6; }
+:root[data-theme="light"] .archive-index nav a:hover,
+:root[data-theme="light"] .archive-index nav a[aria-current="page"] { background: #e7ebef; border-color: currentColor; }

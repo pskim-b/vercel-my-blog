@@ -1,0 +1,545 @@
+{
+  "version": 2,
+  "sections": [
+    {
+      "id": "tech",
+      "title": "기술",
+      "view": "topic-explorer",
+      "description": "토픽별로 정리한 기술 지식",
+      "requires": [
+        "topicPaths"
+      ]
+    },
+    {
+      "id": "reflections",
+      "title": "감상",
+      "view": "kind-timeline",
+      "description": "책과 영화, 전시와 공연, 맛집의 기록",
+      "requires": [
+        "type"
+      ]
+    },
+    {
+      "id": "writing",
+      "title": "글쓰기",
+      "view": "project-outline",
+      "description": "프로젝트별 자료와 원고",
+      "requires": [
+        "type"
+      ]
+    },
+    {
+      "id": "exercise",
+      "title": "운동",
+      "view": "activity-timeline",
+      "description": "시간순으로 돌아보는 운동 기록",
+      "requires": [
+        "type"
+      ]
+    },
+    {
+      "id": "journal",
+      "title": "일기",
+      "view": "month-timeline",
+      "description": "일상과 개인적인 배움의 기록",
+      "requires": []
+    },
+    {
+      "id": "unclassified",
+      "title": "미분류",
+      "view": "review-list",
+      "description": "분류를 보완하고 라벨링할 글",
+      "requires": []
+    }
+  ],
+  "labelsBySection": {
+    "tech": {
+      "types": {},
+      "labels": {
+        "cassandra": {
+          "title": "Cassandra",
+          "topicPaths": [
+            "cassandra"
+          ]
+        },
+        "cassandra-modeling": {
+          "title": "Cassandra 데이터 모델링",
+          "topicPaths": [
+            "cassandra/modeling"
+          ]
+        },
+        "cassandra-partition-key": {
+          "title": "Cassandra 파티션 키",
+          "topicPaths": [
+            "cassandra/modeling/partition-key"
+          ]
+        },
+        "cassandra-operations": {
+          "title": "Cassandra 운영",
+          "topicPaths": [
+            "cassandra/operations"
+          ]
+        },
+        "kafka": {
+          "title": "Kafka",
+          "topicPaths": [
+            "kafka"
+          ]
+        },
+        "kafka-consumer": {
+          "title": "Kafka Consumer",
+          "topicPaths": [
+            "kafka/consumer"
+          ]
+        },
+        "kafka-rebalancing": {
+          "title": "Kafka 리밸런싱",
+          "topicPaths": [
+            "kafka/consumer/rebalancing"
+          ]
+        },
+        "kafka-offset": {
+          "title": "Kafka Offset",
+          "topicPaths": [
+            "kafka/consumer/offset"
+          ]
+        },
+        "kafka-producer": {
+          "title": "Kafka Producer",
+          "topicPaths": [
+            "kafka/producer"
+          ]
+        },
+        "design": {
+          "title": "설계",
+          "topicPaths": [
+            "design"
+          ]
+        },
+        "design-pattern": {
+          "title": "디자인 패턴",
+          "topicPaths": [
+            "design/patterns"
+          ],
+          "aliases": [
+            "design pattern",
+            "design-patterns",
+            "design_pattern"
+          ]
+        },
+        "system-design": {
+          "title": "시스템 설계",
+          "topicPaths": [
+            "design/architecture"
+          ]
+        },
+        "file-upload": {
+          "title": "파일 업로드",
+          "topicPaths": [
+            "design/architecture/file-upload"
+          ]
+        },
+        "architecture-rules": {
+          "title": "아키텍처 규칙",
+          "topicPaths": [
+            "design/architecture/rules"
+          ]
+        },
+        "ai": {
+          "title": "AI",
+          "topicPaths": [
+            "ai"
+          ]
+        },
+        "coding-agent": {
+          "title": "Coding Agent",
+          "topicPaths": [
+            "ai/agents"
+          ]
+        },
+        "agent-context": {
+          "title": "Agent Context",
+          "topicPaths": [
+            "ai/agents/context"
+          ]
+        },
+        "prompt-engineering": {
+          "title": "프롬프트 설계",
+          "topicPaths": [
+            "ai/prompts"
+          ]
+        },
+        "ai-workflow": {
+          "title": "AI 작업 흐름",
+          "topicPaths": [
+            "ai/workflows"
+          ]
+        },
+        "java": {
+          "title": "Java",
+          "topicPaths": [
+            "java"
+          ]
+        },
+        "java-concurrency": {
+          "title": "Java 동시성",
+          "topicPaths": [
+            "java/concurrency"
+          ]
+        },
+        "java-virtual-threads": {
+          "title": "Virtual Threads",
+          "topicPaths": [
+            "java/concurrency/virtual-threads"
+          ]
+        },
+        "jvm": {
+          "title": "JVM",
+          "topicPaths": [
+            "java/jvm"
+          ]
+        },
+        "spring": {
+          "title": "Spring",
+          "topicPaths": [
+            "java/spring"
+          ]
+        },
+        "spring-boot": {
+          "title": "Spring Boot",
+          "topicPaths": [
+            "java/spring/boot"
+          ]
+        },
+        "devops": {
+          "title": "DevOps",
+          "topicPaths": [
+            "devops"
+          ]
+        },
+        "docker": {
+          "title": "Docker",
+          "topicPaths": [
+            "devops/containers/docker"
+          ]
+        },
+        "kubernetes": {
+          "title": "Kubernetes",
+          "topicPaths": [
+            "devops/containers/kubernetes"
+          ],
+          "aliases": [
+            "k8s"
+          ]
+        },
+        "blue-green": {
+          "title": "Blue/Green 배포",
+          "topicPaths": [
+            "devops/deployment/blue-green"
+          ]
+        },
+        "ci-cd": {
+          "title": "CI/CD",
+          "topicPaths": [
+            "devops/deployment/ci-cd"
+          ],
+          "aliases": [
+            "cicd"
+          ]
+        },
+        "redis": {
+          "title": "Redis",
+          "topicPaths": [
+            "redis"
+          ]
+        },
+        "postgresql": {
+          "title": "PostgreSQL",
+          "topicPaths": [
+            "postgresql"
+          ],
+          "aliases": [
+            "postgres"
+          ]
+        },
+        "frontend": {
+          "title": "프런트엔드",
+          "topicPaths": [
+            "frontend"
+          ]
+        },
+        "nextjs": {
+          "title": "Next.js",
+          "topicPaths": [
+            "frontend/nextjs"
+          ],
+          "aliases": [
+            "next.js"
+          ]
+        },
+        "react": {
+          "title": "React",
+          "topicPaths": [
+            "frontend/react"
+          ]
+        },
+        "git": {
+          "title": "Git",
+          "topicPaths": [
+            "tooling/git"
+          ]
+        }
+      },
+      "legacyCategories": {
+        "nextjs": {
+          "topicPaths": [
+            "frontend/nextjs"
+          ]
+        },
+        "design-pattern": {
+          "topicPaths": [
+            "design/patterns"
+          ]
+        },
+        "study": {}
+      }
+    },
+    "reflections": {
+      "types": {
+        "book": {
+          "title": "책"
+        },
+        "movie": {
+          "title": "영화"
+        },
+        "exhibition": {
+          "title": "전시"
+        },
+        "performance": {
+          "title": "공연"
+        },
+        "restaurant": {
+          "title": "맛집"
+        }
+      },
+      "labels": {
+        "book": {
+          "title": "책",
+          "aliases": [
+            "books",
+            "책",
+            "독서"
+          ],
+          "type": "book"
+        },
+        "movie": {
+          "title": "영화",
+          "aliases": [
+            "film",
+            "영화"
+          ],
+          "type": "movie"
+        },
+        "exhibition": {
+          "title": "전시",
+          "aliases": [
+            "전시"
+          ],
+          "type": "exhibition"
+        },
+        "performance": {
+          "title": "공연",
+          "aliases": [
+            "공연"
+          ],
+          "type": "performance"
+        },
+        "restaurant": {
+          "title": "맛집",
+          "aliases": [
+            "맛집"
+          ],
+          "type": "restaurant"
+        }
+      },
+      "legacyCategories": {
+        "book": {
+          "type": "book"
+        }
+      }
+    },
+    "writing": {
+      "types": {
+        "writing-and-thought": {
+          "title": "글쓰기와 사유"
+        },
+        "poetry": {
+          "title": "시 모음"
+        }
+      },
+      "labels": {
+        "writing": {
+          "title": "글쓰기",
+          "aliases": [
+            "writting",
+            "글쓰기"
+          ]
+        },
+        "poetry": {
+          "title": "시",
+          "aliases": [
+            "poem"
+          ]
+        },
+        "essay": {
+          "title": "에세이",
+          "aliases": [
+            "에세이"
+          ]
+        },
+        "project:writing-and-thought": {
+          "title": "글쓰기와 사유 프로젝트",
+          "type": "writing-and-thought"
+        },
+        "project:poetry": {
+          "title": "시 모음 프로젝트",
+          "type": "poetry"
+        }
+      },
+      "legacyCategories": {
+        "poetry": {}
+      }
+    },
+    "exercise": {
+      "types": {
+        "running": {
+          "title": "러닝"
+        },
+        "strength": {
+          "title": "근력 운동"
+        },
+        "swimming": {
+          "title": "수영"
+        },
+        "cycling": {
+          "title": "사이클"
+        },
+        "hiking": {
+          "title": "등산"
+        }
+      },
+      "labels": {
+        "running": {
+          "title": "러닝",
+          "aliases": [
+            "러닝",
+            "달리기"
+          ],
+          "type": "running"
+        },
+        "strength": {
+          "title": "근력 운동",
+          "aliases": [
+            "근력운동"
+          ],
+          "type": "strength"
+        },
+        "swimming": {
+          "title": "수영",
+          "aliases": [
+            "수영"
+          ],
+          "type": "swimming"
+        },
+        "cycling": {
+          "title": "사이클",
+          "aliases": [
+            "사이클"
+          ],
+          "type": "cycling"
+        },
+        "hiking": {
+          "title": "등산",
+          "aliases": [
+            "등산"
+          ],
+          "type": "hiking"
+        }
+      },
+      "legacyCategories": {
+        "running": {
+          "type": "running"
+        }
+      }
+    },
+    "journal": {
+      "types": {
+        "language-practice": {
+          "title": "언어 학습"
+        },
+        "vehicle": {
+          "title": "차량 기록"
+        }
+      },
+      "labels": {
+        "journal": {
+          "title": "일기",
+          "aliases": [
+            "diary",
+            "lifelog",
+            "일기"
+          ]
+        },
+        "speaking": {
+          "title": "영어 회화",
+          "type": "language-practice"
+        },
+        "language-practice": {
+          "title": "언어 학습",
+          "type": "language-practice"
+        }
+      },
+      "legacyCategories": {
+        "journal": {},
+        "language": {
+          "type": "language-practice"
+        },
+        "mycar": {
+          "type": "vehicle"
+        }
+      }
+    },
+    "unclassified": {
+      "types": {},
+      "labels": {},
+      "legacyCategories": {}
+    }
+  },
+  "sharedLabels": {
+    "ai-generated": {
+      "title": "AI로 정리",
+      "description": "작성 방식이며 AI 기술 토픽을 의미하지 않음",
+      "role": "provenance"
+    },
+    "chat-log": {
+      "title": "대화 기록",
+      "aliases": [
+        "chatlog"
+      ],
+      "role": "format"
+    },
+    "idea": {
+      "title": "아이디어",
+      "role": "state"
+    },
+    "clip": {
+      "title": "클리핑",
+      "role": "format"
+    },
+    "feedback": {
+      "title": "피드백",
+      "description": "글의 대분류를 단독으로 결정하지 않는 주제",
+      "role": "supplementary"
+    }
+  }
+}

@@ -14,6 +14,8 @@ interface HeaderProps {
   categories?: FilterOption[];
   labels?: FilterOption[];
   authenticated?: boolean;
+  selectedYear?: string;
+  selectedSection?: string;
   activeFilter?: {
     type: "category" | "label";
     value: string;
@@ -24,9 +26,15 @@ export default function Header({
   categories = [],
   labels = [],
   authenticated = false,
+  selectedYear,
+  selectedSection,
   activeFilter = null,
 }: HeaderProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterQuery = {
+    ...(selectedSection ? { section: selectedSection } : {}),
+    ...(selectedYear ? { year: selectedYear } : {}),
+  };
 
   return (
     <header className="text-left py-4 px-4 border-b border-gray-700 mt-8">
@@ -63,7 +71,7 @@ export default function Header({
           >
             <div className="mb-4">
               <Link
-                href="/"
+                href={{ pathname: "/", query: filterQuery }}
                 onClick={() => setIsFilterOpen(false)}
                 className={`block rounded px-3 py-2 text-sm transition-colors ${
                   activeFilter
@@ -82,7 +90,7 @@ export default function Header({
                   {categories.map((category) => (
                     <Link
                       key={category.value}
-                      href={{ pathname: "/", query: { category: category.value } }}
+                      href={{ pathname: "/", query: { ...filterQuery, category: category.value } }}
                       onClick={() => setIsFilterOpen(false)}
                       className={`rounded px-2 py-1 text-xs transition-colors ${
                         activeFilter?.type === "category" && activeFilter.value === category.value
@@ -103,7 +111,7 @@ export default function Header({
                     {labels.map((label) => (
                       <Link
                         key={label.value}
-                        href={{ pathname: "/", query: { label: label.value } }}
+                        href={{ pathname: "/", query: { ...filterQuery, label: label.value } }}
                         onClick={() => setIsFilterOpen(false)}
                         className={`rounded-sm border px-2 py-1 text-xs transition-colors ${
                           activeFilter?.type === "label" && activeFilter.value === label.value

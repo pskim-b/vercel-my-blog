@@ -2,16 +2,24 @@ import { PostMeta, getPostBySlug } from "../lib/posts";
 import { compactPreview, textPalette } from "../lib/post-presentation.mjs";
 import type { CSSProperties } from "react";
 import { LockKeyhole } from "lucide-react";
+import ArchiveTimeline from "./ArchiveTimeline";
+import { postYear } from "../lib/archive.mjs";
+import { Fragment } from "react";
 
 interface PostListProps {
   posts?: PostMeta[];
+  years?: { value: string; count: number }[];
+  selectedYear?: string;
+  filter?: { section?: string; category?: string; label?: string };
+  classificationIssues?: Record<string, string[]>;
 }
 
-export default function PostList({ posts = [] }: PostListProps) {
+export default function PostList({ posts = [], years = [], selectedYear, filter, classificationIssues }: PostListProps) {
   return (
-    <div className="h-screen overflow-y-scroll pr-2">
+    <ArchiveTimeline years={years} selectedYear={selectedYear} filter={filter} firstDate={posts[0]?.date}>
+      {posts.length === 0 && <p className="py-8 text-gray-400">{selectedYear ? `${selectedYear}년에 해당하는 글이 없습니다.` : "해당하는 글이 없습니다."}</p>}
       <ul className="space-y-2">
-        {posts.map((post) => {
+        {posts.map((post, index) => {
           const postData = getPostBySlug(post.slug);
           const isPrivate = !post.isPublic;
           const palette = textPalette(post.category);
@@ -50,7 +58,11 @@ export default function PostList({ posts = [] }: PostListProps) {
           contentPreview = compactPreview(contentPreview);
 
           return (
-            <li key={post.slug} className="pb-4">
+            <Fragment key={post.slug}>
+            {(index === 0 || postYear(posts[index - 1].date) !== postYear(post.date)) && (
+              <li className="archive-year-heading"><h2>{postYear(post.date) === "unknown" ? "날짜 미상" : `${postYear(post.date)}년`}</h2></li>
+            )}
+            <li data-post-date={post.date} className="pb-4">
               <a
                 href={`/posts/${post.slug}`}
                 className="post-card block rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-4 transition-colors hover:bg-[var(--card-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
@@ -64,8 +76,8 @@ export default function PostList({ posts = [] }: PostListProps) {
                 } as CSSProperties}
               >
                 <div className="mb-3 flex h-6 min-w-0 items-center gap-2 overflow-hidden whitespace-nowrap text-xs text-gray-500">
-                  <time dateTime={post.date} className="shrink-0">
-                    {new Date(post.date).toLocaleDateString()}
+                  <time dateTime={post.date} title={post.date} className="shrink-0">
+                    {post.date.slice(0, 10).replaceAll("-", ".")}
                   </time>
                   <span
                     title={post.category}
@@ -107,11 +119,17 @@ export default function PostList({ posts = [] }: PostListProps) {
                 <p className="mb-3 line-clamp-2 break-keep text-base font-normal leading-relaxed text-gray-400 [overflow-wrap:anywhere]">
                   {contentPreview}
                 </p>
+                {classificationIssues?.[post.slug]?.length ? (
+                  <div className="classification-issues" aria-label="분류 검토 사유">
+                    {classificationIssues[post.slug].map(issue => <span key={issue}>{issue}</span>)}
+                  </div>
+                ) : null}
               </a>
             </li>
+            </Fragment>
           );
         })}
       </ul>
-    </div>
+    </ArchiveTimeline>
   );
 }

@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { contentSlug, parseContent, indexContent } from "./content.mjs";
+import { normalizeLabels } from "./labels.mjs";
 
 export interface PostMeta {
   title: string;
@@ -14,17 +15,6 @@ export interface PostMeta {
   description: string;
 }
 
-function normalizeLabel(label: unknown): string[] {
-  if (Array.isArray(label)) {
-    return label.filter((item): item is string => typeof item === "string");
-  }
-
-  if (typeof label === "string" && label.trim()) {
-    return [label];
-  }
-
-  return [];
-}
 
 function normalizeScope(scope: unknown): "public" | "private" {
   return scope === "public" ? "public" : "private";
@@ -71,7 +61,7 @@ export function getAllPosts(): PostMeta[] {
         title: data.title,
         date: data.date,
         category: data.category,
-        label: normalizeLabel(data.label),
+        label: normalizeLabels(data.label),
         slug,
         scope: normalizeScope(data.scope),
         isPublic: isPublicSlug(slug, data.scope),
@@ -105,7 +95,7 @@ export function getPostBySlug(slug: string) {
         title: data.title,
         date: data.date,
         category: data.category,
-        label: normalizeLabel(data.label),
+        label: normalizeLabels(data.label),
         slug: decodedSlug,
         scope: normalizeScope(data.scope),
         isPublic: isPublicSlug(decodedSlug, data.scope),
