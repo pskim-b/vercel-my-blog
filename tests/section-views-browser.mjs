@@ -22,7 +22,8 @@ try {
     await page.getByRole("link", { name: privateTitle, exact: true }).count(),
     0,
   );
-  assert.match(await page.locator(".editor-content").innerText(), /0개의 기록/);
+  assert.equal(await page.getByRole("navigation", { name: "기술 토픽 탐색" }).getByRole("link", { name: /^kafka\s/ }).count(), 0);
+  assert.match(await page.locator(".editor-path").innerText(), /모든 토픽/);
   await page.goto(`${base}/?section=parenting`);
   assert.equal(await page.locator(".parenting-record").count(), 0);
 

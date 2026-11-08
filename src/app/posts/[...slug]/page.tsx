@@ -1,12 +1,10 @@
 // src/app/posts/[...slug]/page.tsx
 import { notFound, redirect } from "next/navigation";
-import Markdown from "markdown-to-jsx";
-import CodeBlock from "@/components/CodeBlock";
+import PostMarkdown from "@/components/PostMarkdown";
 import { getPostBySlug } from "@/lib/posts";
 import { isAuthenticated } from "@/lib/auth";
 import { classifyPost, taxonomySections } from "@/lib/taxonomy.mjs";
 import Link from "next/link";
-import type { AnchorHTMLAttributes, ImgHTMLAttributes } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -37,13 +35,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const section = classifyPost(post.meta).section;
   const sectionTitle = taxonomySections.find(item => item.id === section)?.title;
 
-  const rewriteResourceUrl = (url?: string) => {
-    if (!url) return url;
-    const assetBasePath = encodedDir ? `/post-assets/${encodedDir}/resource` : "/post-assets/resource";
-    if (url.startsWith("./resource/")) return `${assetBasePath}/${url.slice("./resource/".length)}`;
-    if (url.startsWith("resource/")) return `${assetBasePath}/${url.slice("resource/".length)}`;
-    return url;
-  };
+  const assetBasePath = encodedDir ? `/post-assets/${encodedDir}/resource` : "/post-assets/resource";
 
   return (
     <div
@@ -54,10 +46,10 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
       <Link className="post-section-back" href={{ pathname: "/", query: { section } }}>← {sectionTitle} 목록</Link>
       {/* Post Header with Meta Information */}
       <header className="mb-8 pb-6 border-b border-gray-700">
-        <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
+        <h1 className="post-title text-4xl font-bold mb-4 leading-tight">
           {post.meta.title}
         </h1>
-        <div className="flex items-center gap-4 text-sm text-gray-400">
+        <div className="post-metadata flex flex-wrap items-center gap-4 text-sm">
           <time dateTime={post.meta.date} className="flex items-center">
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -72,12 +64,12 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
             </svg>
-            <span className="bg-gray-800 text-cyan-300 px-3 py-1 rounded-full text-xs font-medium">
+            <span className="post-meta-chip px-3 py-1 rounded-full text-xs font-medium">
               {post.meta.category}
             </span>
           </span>
           {isPrivate && (
-            <span className="rounded-full bg-red-900/60 px-3 py-1 text-xs font-medium text-red-100">
+            <span className="post-private-badge rounded-full px-3 py-1 text-xs font-medium">
               private
             </span>
           )}
@@ -86,7 +78,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
               {post.meta.label.map((label) => (
                 <span
                   key={label}
-                  className="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-xs font-medium"
+                  className="post-meta-chip px-3 py-1 rounded-full text-xs font-medium"
                 >
                   {label}
                 </span>
@@ -96,89 +88,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         </div>
       </header>
 
-      {/* Post Content */}
-      <article className={`markdown-content max-w-none text-white ${isPrivate ? "bg-transparent" : "bg-black"}`}>
-        <Markdown options={{
-          overrides: {
-            h1: { 
-              component: "h1", 
-              props: { className: "text-3xl font-bold mt-8 mb-6 text-white border-b border-gray-700 pb-2 bg-black" } 
-            },
-            h2: { 
-              component: "h2", 
-              props: { className: "text-2xl font-semibold mt-8 mb-4 text-white bg-black" } 
-            },
-            h3: { 
-              component: "h3", 
-              props: { className: "text-xl font-semibold mt-6 mb-3 text-white bg-black" } 
-            },
-            p: { 
-              component: "p", 
-              props: { className: "mb-6 leading-relaxed text-gray-300 text-lg bg-black" } 
-            },
-            code: { 
-              component: "code", 
-              props: { className: "inline-code" }
-            },
-            pre: { 
-              component: CodeBlock,
-            },
-            img: {
-              // Serve post-local resources through the protected asset route.
-              component: ({ src, alt, title, className, ...rest }: ImgHTMLAttributes<HTMLImageElement>) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={typeof src === "string" ? rewriteResourceUrl(src) : undefined}
-                  alt={alt ?? ""}
-                  title={title}
-                  loading="lazy"
-                  className={["max-w-full h-auto rounded-lg border border-gray-800 my-6", className]
-                    .filter(Boolean)
-                    .join(" ")}
-                  {...rest}
-                />
-              ),
-            },
-            a: { 
-              component: ({ href, className, ...rest }: AnchorHTMLAttributes<HTMLAnchorElement>) => (
-                <a
-                  href={rewriteResourceUrl(href)}
-                  className={["text-blue-400 hover:text-blue-300 hover:underline font-medium", className]
-                    .filter(Boolean)
-                    .join(" ")}
-                  {...rest}
-                />
-              ),
-            },
-            ul: { 
-              component: "ul", 
-              props: { className: "list-disc list-inside mb-6 space-y-2 text-gray-300 bg-black" } 
-            },
-            ol: { 
-              component: "ol", 
-              props: { className: "list-decimal list-inside mb-6 space-y-2 text-gray-300 bg-black" } 
-            },
-            li: {
-              component: "li",
-              props: { className: "text-gray-300 leading-relaxed bg-black" }
-            },
-            blockquote: { 
-              component: "blockquote", 
-              props: { className: "border-l-4 border-blue-500 pl-6 italic text-gray-400 my-6 bg-gray-900 py-4 rounded-r-lg" } 
-            },
-            strong: {
-              component: "strong",
-              props: { className: "font-semibold text-white" }
-            },
-            em: {
-              component: "em",
-              props: { className: "italic text-gray-300" }
-            }
-          },
-        }}>
-          {post.content}
-        </Markdown>
-      </article>
+      <PostMarkdown content={post.content} section={section} assetBasePath={assetBasePath} />
       </main>
     </div>
   );

@@ -147,7 +147,11 @@ export default function SectionView({ section, posts, query, years }: Props) {
           paths.add(parts.slice(0, i).join("/"));
       }
     }
-    const selected = query.topic && paths.has(query.topic) ? query.topic : "";
+    const populatedPaths = [...paths].filter((path) =>
+      classified.some((item) => isWithinTopic(item.result.topicPaths, path)),
+    );
+    const selected =
+      query.topic && populatedPaths.includes(query.topic) ? query.topic : "";
     const visible = selected
       ? classified.filter((item) =>
           isWithinTopic(item.result.topicPaths, selected),
@@ -155,11 +159,11 @@ export default function SectionView({ section, posts, query, years }: Props) {
       : classified;
     const tree = (parent = "", depth = 0): React.ReactNode => (
       <ul>
-        {[...paths]
+        {populatedPaths
           .filter((path) => path.split("/").slice(0, -1).join("/") === parent)
           .sort()
           .map((path) => {
-            const children = [...paths].some((other) =>
+            const children = populatedPaths.some((other) =>
               other.startsWith(`${path}/`),
             );
             const count = classified.filter((item) =>
@@ -179,13 +183,19 @@ export default function SectionView({ section, posts, query, years }: Props) {
               <li key={path} data-topic-depth={depth + 1}>
                 {children ? (
                   <details
+                    className="package-branch"
                     open={selected === path || selected.startsWith(`${path}/`)}
                   >
-                    <summary>
-                      <FolderOpen size={13} aria-hidden="true" />
-                      {path.split("/").at(-1)}
+                    <summary className="package-heading">
+                      <Link
+                        href={href({ topic: path })}
+                        aria-current={selected === path ? "page" : undefined}
+                      >
+                        <FolderOpen size={13} aria-hidden="true" />
+                        <span>{path.split("/").at(-1)}</span>
+                        <small aria-label={`${count}개의 글`}>{count}</small>
+                      </Link>
                     </summary>
-                    {link}
                     {tree(path, depth + 1)}
                   </details>
                 ) : (

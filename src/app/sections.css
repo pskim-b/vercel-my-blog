@@ -67,7 +67,7 @@
   --rule: #dddddd;
   --mark: #111111;
   --selection: #f2f2f2;
-  --grid: #d6d6d6;
+  --grid: #cf766f;
 }
 .blog-shell[data-section-theme="writing"] .blog-logo {
   filter: invert(1);
@@ -103,9 +103,9 @@
   --surface: #edf2f1;
   --paper: #fafcf9;
   --ink: #354d50;
-  --muted-ink: #697d7d;
+  --muted-ink: #5c7070;
   --rule: #d3dfdc;
-  --mark: #527575;
+  --mark: #4d7070;
   --selection: #d3e3de;
 }
 .blog-shell[data-section-theme="parenting"] {
@@ -121,9 +121,9 @@
   --surface: #f8f0ec;
   --paper: #fffaf5;
   --ink: #59424a;
-  --muted-ink: #876d77;
+  --muted-ink: #7d636d;
   --rule: #e4cfd4;
-  --mark: #986275;
+  --mark: #8d596c;
   --selection: #f0dce2;
 }
 .blog-shell > header {
@@ -302,6 +302,17 @@
 }
 .knowledge-tree summary::-webkit-details-marker {
   display: none;
+}
+.knowledge-tree .package-heading {
+  padding: 0;
+  gap: 0;
+}
+.knowledge-tree .package-heading > a {
+  flex: 1;
+  min-width: 0;
+}
+.knowledge-tree .package-heading > a small {
+  padding-left: 8px;
 }
 .knowledge-tree a {
   display: flex;
@@ -709,6 +720,175 @@
   margin-bottom: 24px;
   color: var(--mark);
   font-size: 14px;
+}
+.post-title {
+  color: var(--ink);
+}
+.post-metadata {
+  color: var(--muted-ink);
+}
+.post-meta-chip {
+  background: var(--selection);
+  color: var(--ink);
+}
+.post-private-badge {
+  background: var(--selection);
+  color: var(--ink);
+  border: 1px solid var(--mark);
+}
+.post-source-link {
+  color: var(--mark);
+}
+.post-prose {
+  color: var(--ink);
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.post-prose h1,
+.post-prose h2,
+.post-prose h3,
+.post-prose h4 {
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.6;
+  margin: 2rem 0 1rem;
+}
+.post-prose h1 {
+  font-size: 1.85rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.5rem;
+}
+.post-prose h2 {
+  font-size: 1.55rem;
+}
+.post-prose h3 {
+  font-size: 1.25rem;
+}
+.post-prose p {
+  margin: 0 0 1.5rem;
+  font-size: 1.0625rem;
+}
+.post-prose a {
+  color: var(--mark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.post-prose strong,
+.post-prose em {
+  color: inherit;
+}
+.post-prose ul,
+.post-prose ol {
+  padding-left: 1.5rem;
+  margin: 1.25rem 0;
+}
+.post-prose ul {
+  list-style: disc;
+}
+.post-prose ol {
+  list-style: decimal;
+}
+.post-prose li {
+  margin: 0.5rem 0;
+}
+.post-prose blockquote {
+  background: var(--paper);
+  color: var(--ink);
+  border-left: 3px solid var(--mark);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+}
+.post-prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+.post-prose hr {
+  border-color: var(--rule);
+  margin: 2rem 0;
+}
+.post-prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+.post-prose th,
+.post-prose td {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+}
+.post-prose th {
+  background: var(--paper);
+}
+.post-prose img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+}
+:root .themed-post .markdown-content :not(pre) > .inline-code {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 9%, var(--surface));
+  border: 1px solid var(--rule);
+}
+:root .themed-post .code-block {
+  border-color: var(--rule);
+  background: var(--paper);
+}
+:root .themed-post .code-block-language {
+  color: var(--mark);
+  background: var(--paper);
+  border-color: var(--rule);
+}
+:root .themed-post .code-block .shiki {
+  color: var(--shiki-dark);
+  background: var(--shiki-dark-bg);
+}
+:root .themed-post .code-block .shiki span {
+  color: var(--shiki-dark);
+  background-color: transparent;
+}
+:root[data-theme="light"] .themed-post .code-block .shiki {
+  color: var(--shiki-light);
+  background: var(--shiki-light-bg);
+}
+:root[data-theme="light"] .themed-post .code-block .shiki span {
+  color: var(--shiki-light);
+  background-color: transparent;
+}
+.manuscript-body {
+  padding: 30px;
+  border: 1px solid var(--grid);
+  background: var(--paper);
+}
+.manuscript-body p,
+.manuscript-body li {
+  line-height: 1.9em;
+}
+.manuscript-char {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9em;
+  height: 1.9em;
+  border: 1px solid var(--grid);
+  margin: -1px -1px 0 0;
+  vertical-align: bottom;
+  white-space: pre;
+}
+.manuscript-body h1,
+.manuscript-body h2,
+.manuscript-body h3 {
+  border-bottom: 1px solid var(--grid);
+  padding-bottom: 0.45rem;
+}
+.manuscript-body .manuscript-char > .manuscript-char {
+  border: 0;
+}
+@media (max-width: 760px) {
+  .manuscript-body {
+    padding: 18px 12px;
+  }
 }
 @media (max-width: 760px) {
   .blog-main {
