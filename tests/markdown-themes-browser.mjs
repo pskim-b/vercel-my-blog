@@ -45,10 +45,7 @@ try {
     });
     assert.deepEqual(contrasts.filter(item => item.ratio < 4.49), [], `${section}/${theme}: low contrast`);
     if (section === "writing") {
-      assert.ok(await page.locator(".manuscript-body .manuscript-char").count() > 50);
-      assert.equal(await page.locator(".manuscript-char .manuscript-char").count(), 0);
-      const border = await page.locator(".manuscript-char").first().evaluate(el => getComputedStyle(el).borderColor);
-      assert.equal(border, "rgb(207, 118, 111)");
+      assert.equal(await page.locator(".manuscript-body,.manuscript-char").count(), 0);
       assert.equal(await page.locator(".inline-code").first().textContent(), "inline()");
       assert.equal(await page.locator(".code-block pre code").last().textContent(), 'const nested = "preserved";\n');
     }
@@ -68,7 +65,7 @@ try {
   assert.equal(await tree.getByRole("link", { name: /^ai\s/ }).count(), 1);
   assert.equal(await tree.locator("small").filter({ hasText: /^0$/ }).count(), 0);
   assert.deepEqual(errors, []);
-  console.log(`PASS: ${checks} Markdown theme/contrast/layout checks, source code preservation, red manuscript cells and nonempty unique counted packages`);
+  console.log(`PASS: ${checks} Markdown theme/contrast/layout checks, source code preservation, readable writing prose and nonempty unique counted packages`);
 } finally {
   await browser?.close();
   for (const file of files) fs.unlinkSync(file);

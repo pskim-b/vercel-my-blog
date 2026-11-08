@@ -856,40 +856,7 @@
   color: var(--shiki-light);
   background-color: transparent;
 }
-.manuscript-body {
-  padding: 30px;
-  border: 1px solid var(--grid);
-  background: var(--paper);
-}
-.manuscript-body p,
-.manuscript-body li {
-  line-height: 1.9em;
-}
-.manuscript-char {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.9em;
-  height: 1.9em;
-  border: 1px solid var(--grid);
-  margin: -1px -1px 0 0;
-  vertical-align: bottom;
-  white-space: pre;
-}
-.manuscript-body h1,
-.manuscript-body h2,
-.manuscript-body h3 {
-  border-bottom: 1px solid var(--grid);
-  padding-bottom: 0.45rem;
-}
-.manuscript-body .manuscript-char > .manuscript-char {
-  border: 0;
-}
-@media (max-width: 760px) {
-  .manuscript-body {
-    padding: 18px 12px;
-  }
-}
+
 @media (max-width: 760px) {
   .blog-main {
     padding: 20px 16px;
