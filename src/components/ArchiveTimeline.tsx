@@ -8,7 +8,7 @@ interface ArchiveTimelineProps {
   children: ReactNode;
   years: { value: string; count: number }[];
   selectedYear?: string;
-  filter?: { section?: string; category?: string; label?: string };
+  filter?: { source?: string; section?: string; category?: string; label?: string };
   firstDate?: string;
 }
 

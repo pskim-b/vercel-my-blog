@@ -1,4 +1,5 @@
 import taxonomy from "../../config/taxonomy.json" with { type: "json" };
+import { validateMigrationTaxonomy } from "./migration-taxonomy.mjs";
 
 const baseLabel = value => typeof value === "string" ? value.normalize("NFC").trim().toLowerCase() : "";
 const has = (object, key) => Object.hasOwn(object, key);
@@ -117,6 +118,15 @@ export function createTaxonomy(config) {
   function classifyPost(post) {
     const labels = normalizeLabels(post.label);
     const unknownLabels = labels.filter(label => !definitions.has(label));
+    if (["tistory", "hugo"].includes(post.migration?.source) && post.migration.taxonomy && post.scope === "private" && post.isPublic === false) {
+      try {
+        const target = validateMigrationTaxonomy(post.migration.taxonomy, config);
+        return { ...target, labels, candidates: [target.section], issues: [], unknownLabels };
+      } catch (error) {
+        return { section: "unclassified", type: null, topicPaths: [], labels, candidates: [],
+          issues: [{ code: "invalid-tistory-assignment", message: error.message }], unknownLabels };
+      }
+    }
     const mappings = labels.filter(label => definitions.has(label)).map(label => definitions.get(label)).filter(mapping => mapping.section);
     const category = normalizeLabel(post.category);
     if (legacy.has(category)) mappings.push(legacy.get(category));

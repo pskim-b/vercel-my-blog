@@ -26,7 +26,7 @@ const captions: Record<string, [string, string, string]> = {
   reflections: [
     "THE PRIVATE REVIEW",
     "사적인 감상록",
-    "읽고, 보고, 맛보고. 오래 마음에 남은 것들.",
+    "읽고, 보고, 듣고, 여행하며 오래 마음에 남은 것들.",
   ],
   writing: [
     "WRITING / MANUSCRIPTS",
@@ -34,9 +34,9 @@ const captions: Record<string, [string, string, string]> = {
     "문장을 모으고, 고치고, 하나의 글로 엮습니다.",
   ],
   exercise: [
-    "MOVE / TRAIN / REPEAT",
-    "계속, 움직이기.",
-    "어제의 기록 위에 오늘의 한 걸음을.",
+    "FOCUS / PRACTICE / REPEAT",
+    "조금씩 쌓는 몰입의 시간",
+    "운동과 악기 연습, 열심히 하고 있는 일들을 꾸준히 쌓습니다.",
   ],
   journal: [
     "THE QUIET DAYS",
@@ -343,8 +343,9 @@ export default function SectionView({ section, posts, query, years }: Props) {
       ),
     ),
   ];
+  const yearOnly = section === "journal" || section === "reflections";
   const selectedMonth =
-    query.month && months.includes(query.month) ? query.month : "";
+    !yearOnly && query.month && months.includes(query.month) ? query.month : "";
   const visible = selectedMonth
     ? ordered.filter((item) => item.date.startsWith(selectedMonth))
     : ordered;
@@ -380,7 +381,7 @@ export default function SectionView({ section, posts, query, years }: Props) {
       </header>
       {typeNav}
       {yearsNav}
-      {section !== "reflections" && monthNav}
+      {!yearOnly && monthNav}
       <div
         className={
           section === "reflections" ? "review-archive" : "time-archive"
@@ -388,10 +389,10 @@ export default function SectionView({ section, posts, query, years }: Props) {
       >
         {visible.length
           ? visible.map(({ post, date, result }, i) => {
-              const month = date.slice(0, section === "reflections" ? 4 : 7);
+              const month = date.slice(0, yearOnly ? 4 : 7);
               const previous = visible[i - 1]?.date.slice(
                 0,
-                section === "reflections" ? 4 : 7,
+                yearOnly ? 4 : 7,
               );
               const metrics: { distance?: string; pace?: string } =
                 section === "exercise" && result.type === "running"
@@ -402,7 +403,7 @@ export default function SectionView({ section, posts, query, years }: Props) {
                   {month !== previous && (
                     <h2 className="period-heading">
                       {month.replace("-", "년 ")}
-                      {section === "reflections" ? "년" : "월"}
+                      {yearOnly ? "년" : "월"}
                     </h2>
                   )}
                   <article

@@ -2,6 +2,7 @@
 title: "둘째 아이를 낳는 것은 남자의 인생을 어떻게 무너뜨리는가."
 date: "2026-10-11"
 category: "note"
+scope: "public"
 label:
   - "ai-generated"
   - "clip"

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { withMigrationMetadata } from "./migration.mjs";
 
 export function getContentFiles(dir) {
   const files = [];
@@ -26,9 +27,10 @@ export function parseContent(source, format) {
     }
     if (!Number.isFinite(Date.parse(data.date))) throw new Error("Invalid HTML date");
     if (data.scope !== undefined && !["public", "private"].includes(data.scope)) throw new Error("Invalid HTML scope");
-    return { data, content: source.slice(match[0].length).trimStart() };
+    return { data: withMigrationMetadata(data), content: source.slice(match[0].length).trimStart() };
   }
-  return matter(source);
+  const parsed = matter(source);
+  return { ...parsed, data: withMigrationMetadata(parsed.data) };
 }
 
 export function indexContent(root) {

@@ -1,5 +1,14 @@
 # Deployment Guide
 
+## Labels
+
+Labels are trimmed, Unicode-normalized (NFC), lowercased, and deduplicated per
+post. Display, filter counts, colors and query parameters use the same values.
+Known aliases in `src/lib/labels.mjs` currently map `writting` to `writing` and
+`chatlog` to `chat-log`; legacy filter URLs continue to work. Add aliases only
+after confirming the intended label, not by automatic fuzzy matching. Category
+names are unchanged. Both Markdown and HTML frontmatter use these rules.
+
 ## Theme Schedule
 
 Shared blog pages use the light theme from 06:00 to 18:00 in Asia/Seoul and the

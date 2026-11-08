@@ -2,6 +2,7 @@
 title: "반복되는 인시던트와 기술 부채를 대하는 태도"
 date: "2026-09-02"
 category: "note"
+scope: "public"
 label:
   - "ai-generated"
   - "incident-accountability"

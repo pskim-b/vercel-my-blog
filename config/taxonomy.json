@@ -15,7 +15,7 @@
       "id": "reflections",
       "title": "감상",
       "view": "kind-timeline",
-      "description": "책과 영화, 전시와 공연, 맛집의 기록",
+      "description": "책과 영화, 전시와 공연, 여행과 음악, 맛집의 기록",
       "requires": [
         "type"
       ],
@@ -33,9 +33,9 @@
     },
     {
       "id": "exercise",
-      "title": "운동",
+      "title": "몰입",
       "view": "activity-timeline",
-      "description": "시간순으로 돌아보는 운동 기록",
+      "description": "운동과 악기 연습 등 꾸준히 몰입하는 과정의 기록",
       "requires": [
         "type"
       ],
@@ -326,6 +326,96 @@
           "topicPaths": [
             "engineering-management/delivery"
           ]
+        },
+        "database": {
+          "title": "데이터베이스",
+          "topicPaths": [
+            "database"
+          ]
+        },
+        "big-data": {
+          "title": "빅데이터",
+          "topicPaths": [
+            "big-data"
+          ]
+        },
+        "security": {
+          "title": "보안",
+          "topicPaths": [
+            "security"
+          ]
+        },
+        "it-news": {
+          "title": "IT 뉴스",
+          "topicPaths": [
+            "it-news"
+          ]
+        },
+        "project-history": {
+          "title": "프로젝트 기록",
+          "topicPaths": [
+            "project-history"
+          ]
+        },
+        "conference": {
+          "title": "컨퍼런스",
+          "topicPaths": [
+            "conference"
+          ]
+        },
+        "ai-analytics": {
+          "title": "AI·분석",
+          "topicPaths": [
+            "ai/analytics"
+          ]
+        },
+        "cloud": {
+          "title": "클라우드",
+          "topicPaths": [
+            "cloud"
+          ]
+        },
+        "data-science": {
+          "title": "데이터 사이언스",
+          "topicPaths": [
+            "data-science"
+          ]
+        },
+        "hadoop": {
+          "title": "Hadoop",
+          "topicPaths": [
+            "big-data/hadoop"
+          ]
+        },
+        "hbase": {
+          "title": "HBase",
+          "topicPaths": [
+            "big-data/hbase"
+          ]
+        },
+        "nifi": {
+          "title": "NiFi",
+          "topicPaths": [
+            "big-data/nifi"
+          ]
+        },
+        "data-lake": {
+          "title": "데이터 레이크",
+          "topicPaths": [
+            "big-data/data-lake"
+          ]
+        },
+        "msa": {
+          "title": "MSA",
+          "topicPaths": [
+            "design/architecture/msa"
+          ]
+        },
+        "data-intensive": {
+          "title": "데이터 중심 설계",
+          "topicPaths": [
+            "design/architecture/data-intensive"
+          ]
         }
       },
       "legacyCategories": {
@@ -358,6 +448,12 @@
         },
         "restaurant": {
           "title": "맛집"
+        },
+        "travel": {
+          "title": "여행"
+        },
+        "music": {
+          "title": "음악"
         }
       },
       "labels": {
@@ -398,6 +494,22 @@
             "맛집"
           ],
           "type": "restaurant"
+        },
+        "travel": {
+          "title": "여행",
+          "type": "travel",
+          "aliases": [
+            "여행",
+            "국내여행"
+          ]
+        },
+        "music": {
+          "title": "음악",
+          "type": "music",
+          "aliases": [
+            "음악",
+            "음악감상"
+          ]
         }
       },
       "legacyCategories": {
@@ -415,7 +527,7 @@
           "title": "시 모음"
         },
         "management-essays": {
-          "title": "매니저의 사유"
+          "title": "타인에 대한 사유"
         }
       },
       "labels": {
@@ -447,7 +559,7 @@
           "type": "poetry"
         },
         "project:management-essays": {
-          "title": "매니저의 사유 프로젝트",
+          "title": "타인에 대한 사유",
           "type": "management-essays"
         }
       },
@@ -471,6 +583,9 @@
         },
         "hiking": {
           "title": "등산"
+        },
+        "saxophone": {
+          "title": "색소폰 연습"
         }
       },
       "labels": {
@@ -509,6 +624,16 @@
             "등산"
           ],
           "type": "hiking"
+        },
+        "saxophone": {
+          "title": "색소폰 연습",
+          "type": "saxophone",
+          "aliases": [
+            "alt.sax",
+            "alto-saxophone",
+            "색소폰",
+            "알토색소폰"
+          ]
         }
       },
       "legacyCategories": {
@@ -613,6 +738,29 @@
     "learning": {
       "title": "배움과 메타인지",
       "role": "supplementary"
+    },
+    "tistory": {
+      "title": "티스토리",
+      "role": "provenance"
+    },
+    "경제": {
+      "title": "경제",
+      "role": "supplementary",
+      "aliases": [
+        "economy",
+        "경제공부"
+      ]
+    },
+    "hugo": {
+      "title": "Hugo",
+      "role": "provenance",
+      "aliases": [
+        "hblog"
+      ]
+    },
+    "working-copy": {
+      "title": "작업 문서",
+      "role": "state"
     }
   }
 }

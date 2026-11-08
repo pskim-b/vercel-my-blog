@@ -6,7 +6,7 @@ scope: "public"
 label:
   - "ai-generated"
   - "chat-log"
-  - "writting"
+  - "writing"
   - "project:writing-and-thought"
 ---
 

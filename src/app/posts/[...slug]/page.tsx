@@ -50,15 +50,11 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
           {post.meta.title}
         </h1>
         <div className="post-metadata flex flex-wrap items-center gap-4 text-sm">
-          <time dateTime={post.meta.date} className="flex items-center">
+          <time dateTime={post.meta.date} title={post.meta.date} className="flex items-center">
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            {new Date(post.meta.date).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
+            {post.meta.date.replace("T", " ")}
           </time>
           <span className="flex items-center">
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,6 +68,12 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <span className="post-private-badge rounded-full px-3 py-1 text-xs font-medium">
               private
             </span>
+          )}
+          {post.meta.migration && (
+            <a href={post.meta.migration.originalUrl} target="_blank" rel="noopener noreferrer"
+              className="post-source-link hover:underline" title={post.meta.migration.originalUrl}>
+              원문 보기 · {post.meta.migration.source}
+            </a>
           )}
           {post.meta.label.length > 0 && (
             <span className="flex flex-wrap items-center gap-2">

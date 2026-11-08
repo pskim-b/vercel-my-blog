@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPostBySlug } from "@/lib/posts";
+import { getPostBySlug, getPrivateHtmlFile } from "@/lib/posts";
 import { isAuthenticated } from "@/lib/auth";
 import { injectPostMetadata } from "@/lib/html-document.mjs";
 
@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
   if (!post.meta.isPublic && !(await isAuthenticated())) {
     return new NextResponse("Authentication required", { status: 401, headers: { "Cache-Control": "no-store" } });
   }
-  return new NextResponse(injectPostMetadata(post.content, post.meta), {
+  return new NextResponse(injectPostMetadata(post.content, { ...post.meta, editUrl: process.env.BLOG_ENABLE_POST_EDITING === "true" && getPrivateHtmlFile(post.meta.slug) && await isAuthenticated() ? `/edit/${post.meta.slug.split("/").map(encodeURIComponent).join("/")}` : undefined }), {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "private, no-store",

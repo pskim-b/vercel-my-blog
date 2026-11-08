@@ -5,6 +5,7 @@ category: "note"
 label:
   - "ai-generated"
   - "running"
+scope: public
 ---
 
 # 2026 강서 허준런 10km 준비 계획

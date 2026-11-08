@@ -16,6 +16,9 @@ interface HeaderProps {
   authenticated?: boolean;
   selectedYear?: string;
   selectedSection?: string;
+  selectedSource?: string;
+  tistoryCount?: number;
+  hugoCount?: number;
   activeFilter?: {
     type: "category" | "label";
     value: string;
@@ -28,10 +31,14 @@ export default function Header({
   authenticated = false,
   selectedYear,
   selectedSection,
+  selectedSource,
+  tistoryCount = 0,
+  hugoCount = 0,
   activeFilter = null,
 }: HeaderProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterQuery = {
+    ...(selectedSource ? { source: selectedSource } : {}),
     ...(selectedSection ? { section: selectedSection } : {}),
     ...(selectedYear ? { year: selectedYear } : {}),
   };
@@ -39,6 +46,10 @@ export default function Header({
   return (
     <header className="text-left py-4 px-4 border-b border-gray-700 mt-8">
       <ThemeSwitch />
+      {authenticated && (tistoryCount > 0 || hugoCount > 0) && <nav className="mb-3 flex flex-wrap gap-4 text-sm" aria-label="원본 블로그 메뉴">
+        {tistoryCount > 0 && <Link href="/?source=tistory" className="text-teal-400 hover:underline">티스토리 글 메뉴 · {tistoryCount}</Link>}
+        {hugoCount > 0 && <Link href="/?source=hugo" className="text-teal-400 hover:underline">Hugo 글 메뉴 · {hugoCount}</Link>}
+      </nav>}
       <div className="relative inline-flex items-center gap-1">
         <div className="flex items-center">
           <Link href="/" className="hover:opacity-80 transition-opacity">

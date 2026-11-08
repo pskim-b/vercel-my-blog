@@ -5,6 +5,7 @@ category: "note"
 label:
   - "ai-generated"
   - "running"
+scope: public
 ---
 
 ## 오늘 운동 요약

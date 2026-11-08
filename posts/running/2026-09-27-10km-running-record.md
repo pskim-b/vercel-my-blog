@@ -5,6 +5,7 @@ category: "running"
 label:
   - "ai-generated"
 activityDate: "2026-09-26"
+scope: public
 ---
 
 # 2026-09-26 러닝 기록

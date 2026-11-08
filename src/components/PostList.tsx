@@ -10,7 +10,7 @@ interface PostListProps {
   posts?: PostMeta[];
   years?: { value: string; count: number }[];
   selectedYear?: string;
-  filter?: { section?: string; category?: string; label?: string };
+  filter?: { source?: string; section?: string; category?: string; label?: string };
   classificationIssues?: Record<string, string[]>;
 }
 
@@ -20,7 +20,7 @@ export default function PostList({ posts = [], years = [], selectedYear, filter,
       {posts.length === 0 && <p className="py-8 text-gray-400">{selectedYear ? `${selectedYear}년에 해당하는 글이 없습니다.` : "해당하는 글이 없습니다."}</p>}
       <ul className="space-y-2">
         {posts.map((post, index) => {
-          const postData = getPostBySlug(post.slug);
+          const postData = post.format === "html" ? null : getPostBySlug(post.slug);
           const isPrivate = !post.isPublic;
           const palette = textPalette(post.category);
           let contentPreview = '';

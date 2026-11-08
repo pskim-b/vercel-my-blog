@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { contentSlug, parseContent, indexContent } from "./content.mjs";
+import { parseContent } from "./content.mjs";
+import { indexPostSources } from "./post-files.mjs";
+import { cache } from "react";
 import { normalizeLabels } from "./labels.mjs";
 import { canAccessPost } from "./taxonomy.mjs";
 
@@ -15,7 +17,22 @@ export interface PostMeta {
   isPublic: boolean;
   format: "md" | "html";
   description: string;
+  migration?: {
+    source: "naver" | "tistory" | "hugo";
+    originalUrl: string;
+    originalPath: string;
+    originalPublishedAt: string;
+    importedAt: string;
+    originalId?: string;
+    sourcePath?: string;
+    taxonomy?: { section: string; type: string | null; topicPaths: string[] };
+  };
 }
+
+const getPostSources = cache(() => indexPostSources({
+  publicRoot: path.join(process.cwd(), "posts"),
+  privateRoot: process.env.BLOG_PRIVATE_POSTS_DIR,
+}));
 
 function normalizeScope(scope: unknown): "public" | "private" {
   return scope === "public" ? "public" : "private";
@@ -40,10 +57,11 @@ function readAllowedFolders(): string[] {
 export function isPublicSlug(slug: string, scope?: unknown, metadata?: Record<string, unknown>): boolean {
   const normalizedSlug = slug.replace(/\\/g, "/");
   const topLevelFolder = normalizedSlug.split("/")[0];
+  const source = getPostSources().get(normalizedSlug);
+  if (!source || source.privateSource) return false;
 
   if (!metadata) {
-    const file = indexContent(path.join(process.cwd(), "posts")).get(normalizedSlug);
-    if (!file) return false;
+    const file = source.file;
     metadata = parseContent(fs.readFileSync(file, "utf8"), file.endsWith(".html") ? "html" : "md").data;
   }
   const publicSource = normalizeScope(scope ?? metadata?.scope) === "public" || readAllowedFolders().includes(topLevelFolder);
@@ -51,17 +69,13 @@ export function isPublicSlug(slug: string, scope?: unknown, metadata?: Record<st
 }
 
 export function getAllPosts(): PostMeta[] {
-  const postsDir = path.join(process.cwd(), "posts");
-  const markdownFiles = Array.from(indexContent(postsDir).values());
+  const markdownFiles = Array.from(getPostSources());
 
   return markdownFiles
-    .map((filePath) => {
+    .map(([slug, { file: filePath, privateSource }]) => {
       const fileContent = fs.readFileSync(filePath, "utf8");
       const format: "html" | "md" = filePath.endsWith(".html") ? "html" : "md";
       const { data } = parseContent(fileContent, format);
-      
-      // Create slug from relative path to posts directory
-      const slug = contentSlug(postsDir, filePath);
       
       return {
         title: data.title,
@@ -70,10 +84,11 @@ export function getAllPosts(): PostMeta[] {
         category: data.category,
         label: normalizeLabels(data.label),
         slug,
-        scope: normalizeScope(data.scope),
+        scope: privateSource ? "private" as const : normalizeScope(data.scope),
         isPublic: isPublicSlug(slug, data.scope, data),
         format,
         description: typeof data.description === "string" ? data.description : "",
+        migration: data.migration,
       };
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -81,12 +96,12 @@ export function getAllPosts(): PostMeta[] {
 
 // Get post by slug (supports subdirectories)
 export function getPostBySlug(slug: string) {
-  const postsDir = path.join(process.cwd(), "posts");
   
   // Next.js route params have already been decoded.
   const decodedSlug = slug;
   
-  const targetFile = indexContent(postsDir).get(decodedSlug);
+  const source = getPostSources().get(decodedSlug);
+  const targetFile = source?.file;
   
   if (!targetFile) {
     return null;
@@ -105,10 +120,11 @@ export function getPostBySlug(slug: string) {
         category: data.category,
         label: normalizeLabels(data.label),
         slug: decodedSlug,
-        scope: normalizeScope(data.scope),
+        scope: source?.privateSource ? "private" as const : normalizeScope(data.scope),
         isPublic: isPublicSlug(decodedSlug, data.scope, data),
         format,
         description: typeof data.description === "string" ? data.description : "",
+        migration: data.migration,
       },
       content,
     };
@@ -116,4 +132,9 @@ export function getPostBySlug(slug: string) {
     console.error(`Error reading file for slug ${decodedSlug}:`, error);
     return null;
   }
+}
+
+export function getPrivateHtmlFile(slug: string): string | null {
+  const source = getPostSources().get(slug);
+  return source?.privateSource && source.file.endsWith(".html") ? source.file : null;
 }

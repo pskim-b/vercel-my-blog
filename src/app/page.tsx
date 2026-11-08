@@ -1,4 +1,5 @@
 import Header from "@/components/Header";
+import Link from "next/link";
 import { getAllPosts } from "../lib/posts";
 import PostList from "@/components/PostList";
 import { isAuthenticated } from "@/lib/auth";
@@ -36,9 +37,14 @@ export default async function HomePage({
   searchParams?: SearchParams;
 }) {
   const authenticated = await isAuthenticated();
-  const allPosts = getAllPosts().filter((post) => authenticated || post.isPublic);
-  const classifications = new Map(allPosts.map(post => [post.slug, classifyPost(post)]));
+  const visiblePosts = getAllPosts().filter((post) => authenticated || post.isPublic);
   const params = searchParams ? await searchParams : {};
+  const sourceParam = firstParam(params.source);
+  const selectedSource = sourceParam === "tistory" || sourceParam === "hugo" ? sourceParam : undefined;
+  const tistoryCount = visiblePosts.filter(post => post.migration?.source === "tistory").length;
+  const hugoCount = visiblePosts.filter(post => post.migration?.source === "hugo").length;
+  const allPosts = selectedSource ? visiblePosts.filter(post => post.migration?.source === selectedSource) : visiblePosts;
+  const classifications = new Map(allPosts.map(post => [post.slug, classifyPost(post)]));
   const sectionParam = firstParam(params.section);
   const selectedSection = taxonomySections.find(section => section.id === sectionParam);
   if (selectedSection && !canAccessSection(selectedSection.id, authenticated)) {
@@ -68,6 +74,7 @@ export default async function HomePage({
   const years = archiveYears(filteredByTopic.map(post => ({ ...post, date: sectionDate(post, selectedSection?.id) })));
   const filteredPosts = selectedYear ? filteredByTopic.filter(post => postYear(sectionDate(post, selectedSection?.id)) === selectedYear) : filteredByTopic;
   const topicFilter = {
+    ...(selectedSource ? { source: selectedSource } : {}),
     ...(selectedSection ? { section: selectedSection.id } : {}),
     ...(selectedCategory ? { category: selectedCategory } : selectedLabel ? { label: selectedLabel } : {}),
   };
@@ -97,9 +104,16 @@ export default async function HomePage({
         activeFilter={activeFilter}
         selectedYear={selectedYear}
         selectedSection={selectedSection?.id}
+        selectedSource={selectedSource}
+        tistoryCount={authenticated ? tistoryCount : 0}
+        hugoCount={authenticated ? hugoCount : 0}
       />
       <main className="blog-main">
-        <SectionTabs sections={sections} selectedSection={selectedSection?.id} total={allPosts.length} />
+        {selectedSource && <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-gray-400" aria-label="현재 원본 블로그">
+          <strong className="text-white">{selectedSource === "hugo" ? "Hugo" : "티스토리"} 글 {allPosts.length}편</strong>
+          <Link href="/" className="text-blue-400 hover:underline">블로그 전체 보기</Link>
+        </div>}
+        <SectionTabs sections={sections} selectedSection={selectedSection?.id} total={allPosts.length} query={selectedSource ? { source: selectedSource } : undefined} />
         {selectedSection?.id === "unclassified" && (
           <header className="section-heading">
             <h1>{selectedSection.title}</h1>

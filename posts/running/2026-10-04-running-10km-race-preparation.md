@@ -5,6 +5,7 @@ category: "note"
 label:
   - "ai-generated"
   - "running"
+scope: public
 ---
 
 # 2026-10-04 러닝 기록 및 10/10 10km 대회 준비

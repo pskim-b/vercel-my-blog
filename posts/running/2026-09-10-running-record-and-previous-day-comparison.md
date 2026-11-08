@@ -4,6 +4,7 @@ date: "2026-09-10"
 category: "running"
 label:
   - "ai-generated"
+scope: public
 ---
 
 ## 오늘 운동 요약

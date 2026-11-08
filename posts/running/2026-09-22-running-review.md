@@ -4,6 +4,7 @@ date: "2026-09-22"
 category: "running"
 label:
   - "ai-generated"
+scope: public
 ---
 
 # 2026-09-22 러닝 리뷰

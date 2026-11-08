@@ -3,7 +3,7 @@ title: "감정을 조직 데이터로 해석하는 매니저의 사고방식"
 date: "2026-09-28"
 category: "note"
 label:
-  - "Writing"
+  - "writing"
   - "idea"
   - "project:management-essays"
 ---

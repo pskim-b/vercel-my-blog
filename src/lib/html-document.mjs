@@ -16,10 +16,14 @@ function escapeHtml(value) {
 }
 
 function metadataBar(meta) {
+  const homeUrl = ["tistory", "hugo"].includes(meta.migration?.source) ? `/?source=${meta.migration.source}` : "/";
   const categoryUrl = `/?category=${encodeURIComponent(meta.category)}`;
   const labels = meta.label.map(label =>
     `<a class="label" href="${escapeHtml(`/?label=${encodeURIComponent(label)}`)}">${escapeHtml(label)}</a>`
   ).join("");
+  const original = meta.migration
+    ? `<a href="${escapeHtml(meta.migration.originalUrl)}" rel="noreferrer">원문 보기 · ${escapeHtml(meta.migration.source)}</a>`
+    : "";
   return `<psnote-meta lang="ko" dir="ltr" style="all:initial!important;display:block!important;position:static!important;width:auto!important;min-width:0!important;max-width:none!important;height:auto!important;margin:0!important;padding:0!important">
 <template shadowrootmode="open">
 <style>
@@ -39,10 +43,10 @@ time{white-space:nowrap}
 @media(max-width:560px){.inner{padding:10px 14px}}
 </style>
 <nav aria-label="글 메타정보"><div class="inner">
-<a href="/">블로그로 돌아가기</a>
+<a href="${escapeHtml(homeUrl)}">블로그로 돌아가기</a>
 <div class="details"><time datetime="${escapeHtml(meta.date)}">${escapeHtml(meta.date)}</time>
 <a class="category" href="${escapeHtml(categoryUrl)}">${escapeHtml(meta.category)}</a>
-${labels}${meta.isPublic ? "" : '<span class="private">private</span>'}</div>
+${labels}${original}${meta.editUrl ? `<a href="${escapeHtml(meta.editUrl)}">수정</a>` : ""}${meta.isPublic ? "" : '<span class="private">private</span>'}</div>
 </div></nav>
 </template></psnote-meta>`;
 }
