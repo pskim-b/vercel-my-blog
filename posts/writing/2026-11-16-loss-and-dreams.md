@@ -1,5 +1,5 @@
 ---
-title: "상실과 꿈"
+title: "운동장을 도는 아이들"
 date: "2026-11-16"
 category: "writing"
 label:
@@ -7,7 +7,7 @@ label:
   - "writing"
   - "project:writing-and-thought"
 description: "뜻대로 흘러가지 않는 하루의 상실감과 꿈속에서 마주하는 희미한 낙관에 관한 글."
-scope: private
+scope: public
 ---
 
 어린이들이 운동장을 돌고 있다. 구령대 옆 길게 뻗은 계단들에는 아이들이 던져 놓은 가방이 뒹굴고 있다. 끼리끼리 장난치면서 도는 아이, 혼자 조용히 도는 아이, 앞서가는 친구를 향해 달려가는 아이, 모두 다 제각각이다. 그렇게 두어 바퀴 운동장을 돌고 나면 아이들은 교실로 들어갈 것이다.
